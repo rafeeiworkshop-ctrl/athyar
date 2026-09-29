@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اثیار - athyar.com | عسل طبیعی، میوه خشک، صنایع دستی و گیاهان دارویی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --green-900:#0d2818;--green-800:#1B4332;--green-700:#2D6A4F;--green-600:#40916C;--green-500:#52B788;--green-100:#D8F3DC;--green-50:#F0FAF0;
+    --orange-600:#E36414;--orange-500:#FB8B24;--orange-400:#FF9F1C;--orange-300:#FFBF69;--orange-50:#FFF7ED;
+    --cream:#FFFBF2;--paper:#F8F5EF;--text:#1E1E1E;--text-light:#6B7280;--border:#E8E0D0;
+    --shadow:0 10px 40px rgba(27,67,50,0.08);--shadow-lg:0 20px 60px rgba(27,67,50,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--cream);color:var(--text);line-height:1.8;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .fa-num{font-variant-numeric:persian}
+  body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 10% 20%, rgba(64,145,108,0.06) 0%, transparent 40%),radial-gradient(circle at 90% 80%, rgba(251,139,36,0.06) 0%, transparent 40%);pointer-events:none;z-index:-1}
+  a{color:inherit;text-decoration:none} button{font-family:'Vazirmatn',sans-serif;cursor:pointer;border:none;background:none} img{display:block;max-width:100%} input,textarea,select{font-family:'Vazirmatn',sans-serif}
+  .topbar{background:var(--green-900);color:#fff;font-size:13px;padding:8px 0}
+  .topbar .container{display:flex;justify-content:space-between;align-items:center}
+  .container{width:min(1320px,92%);margin:0 auto}
+  .header{position:sticky;top:0;z-index:100;background:rgba(255,251,242,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .header-main{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:20px}
+  .logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px;color:var(--green-800)}
+  .logo-mark{width:48px;height:48px;background:linear-gradient(135deg,var(--green-800),var(--green-600));border-radius:14px;display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:0 8px 20px rgba(27,67,50,0.25)}
+  .logo small{display:block;font-size:11px;font-weight:400;color:var(--text-light);margin-top:-4px}
+  .search-box{flex:1;max-width:520px;background:#fff;border:1.5px solid var(--border);border-radius:999px;display:flex;align-items:center;padding:6px 6px 6px 18px;gap:10px;box-shadow:var(--shadow)}
+  .search-box:focus-within{border-color:var(--green-600);box-shadow:0 0 0 4px rgba(64,145,108,0.15)}
+  .search-box input{flex:1;border:none;outline:none;font-size:14px;background:transparent;padding:8px}
+  .search-btn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green-700),var(--green-600));color:#fff;display:grid;place-items:center}
+  .header-actions{display:flex;align-items:center;gap:8px}
+  .icon-btn{width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);display:grid;place-items:center;position:relative;transition:.2s;font-size:18px}
+  .icon-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .badge{position:absolute;top:-4px;left:-4px;background:var(--orange-500);color:#fff;font-size:11px;min-width:20px;height:20px;border-radius:999px;display:grid;place-items:center;font-weight:700;border:2px solid var(--cream)}
+  .user-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);padding:6px 14px 6px 6px;border-radius:999px}
+  .user-btn .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange-400),var(--orange-600));display:grid;place-items:center;color:#fff;font-weight:700}
+  .nav{display:flex;gap:24px;align-items:center;padding:12px 0;overflow:auto;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{white-space:nowrap;font-size:14px;font-weight:500;color:var(--text-light);position:relative;padding:4px 0;cursor:pointer}
+  .nav a.active,.nav a:hover{color:var(--green-800)}
+  .nav a.active::after{content:'';position:absolute;bottom:-12px;right:0;left:0;height:3px;background:var(--orange-400);border-radius:999px}
+  .cat-chip{display:inline-flex;align-items:center;gap:6px;background:var(--green-50);color:var(--green-800);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--green-100)}
+  .hero{position:relative;padding:30px 0 50px;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:24px;align-items:stretch}
+  .hero-main{position:relative;background:linear-gradient(135deg,var(--green-900) 0%, var(--green-700) 50%, var(--green-600) 100%);border-radius:32px;padding:44px;color:#fff;overflow:hidden;min-height:460px;display:flex;flex-direction:column;justify-content:center}
+  .hero-main::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%, rgba(255,191,105,0.15) 0%, transparent 50%)}
+  .hero-content{position:relative;z-index:2;max-width:520px}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:999px;font-size:12px;margin-bottom:18px}
+  .hero-badge .dot{width:8px;height:8px;background:var(--orange-400);border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,159,28,0.4)}70%{box-shadow:0 0 0 8px rgba(255,159,28,0)}100%{box-shadow:0 0 0 0 rgba(255,159,28,0)}}
+  .hero h1{font-size:42px;line-height:1.15;font-weight:800;margin-bottom:16px}
+  .hero h1 span{color:var(--orange-300)}
+  .hero p{font-size:16px;opacity:0.9;margin-bottom:28px;line-height:1.9}
+  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;font-size:14px;transition:.25s;white-space:nowrap}
+  .btn-primary{background:linear-gradient(135deg,var(--orange-400),var(--orange-600));color:#fff;box-shadow:0 10px 24px rgba(227,100,20,0.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(227,100,20,0.45)}
+  .btn-ghost{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px)}
+  .btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--green-800)}
+  .hero-side{display:flex;flex-direction:column;gap:24px}
+  .banner-card{flex:1;border-radius:24px;padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:218px}
+  .banner-card.orange{background:linear-gradient(135deg,#FFF7ED 0%, #FFEDD5 100%);border:1.5px solid #FED7AA}
+  .banner-card.green{background:linear-gradient(135deg,#F0FAF0 0%, #D8F3DC 100%);border:1.5px solid #B7E4C7}
+  .banner-card h3{font-size:20px;font-weight:800;margin-bottom:8px}
+  .banner-card p{font-size:13px;color:var(--text-light);margin-bottom:16px}
+  .banner-card img{position:absolute;left:0;bottom:0;width:140px;height:140px;object-fit:cover;border-radius:16px 0 24px 0;opacity:0.9}
+  .section{padding:50px 0}
+  .section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+  .section-head h2{font-size:28px;font-weight:800;color:var(--green-900)}
+  .section-head p{color:var(--text-light);font-size:14px;margin-top:6px}
+  .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .cat-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px 14px;text-align:center;transition:.25s;cursor:pointer}
+  .cat-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--green-100)}
+  .cat-icon{width:64px;height:64px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;font-size:28px}
+  .cat-card h4{font-size:14px;font-weight:700;margin-bottom:4px}
+  .cat-card span{font-size:12px;color:var(--text-light)}
+  .cat-card .cat-desc{font-size:11px;color:var(--text-light);margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
+  .filter-bar{background:#fff;border:1px solid var(--border);border-radius:20px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px;box-shadow:var(--shadow);position:sticky;top:118px;z-index:20}
+  .filter-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:600;transition:.2s;cursor:pointer}
+  .chip.active{background:var(--green-800);color:#fff;border-color:var(--green-800)}
+  .sort-select{border:1.5px solid var(--border);border-radius:999px;padding:8px 14px;font-size:13px;background:#fff;outline:none}
+  .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .product-card{background:#fff;border:1px solid var(--border);border-radius:22px;overflow:hidden;transition:.3s;position:relative;display:flex;flex-direction:column}
+  .product-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+  .product-img{aspect-ratio:1/1;background:var(--paper);position:relative;overflow:hidden}
+  .product-img img{width:100%;height:100%;object-fit:cover;transition:.5s}
+  .product-card:hover .product-img img{transform:scale(1.08)}
+  .product-badges{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+  .pbadge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+  .pbadge.discount{background:var(--orange-500);color:#fff}
+  .pbadge.new{background:var(--green-600);color:#fff}
+  .pbadge.festival{background:linear-gradient(135deg,var(--orange-400),var(--orange-600));color:#fff}
+  .product-actions{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateX(-10px);transition:.3s}
+  .product-card:hover .product-actions{opacity:1;transform:translateX(0)}
+  .paction{width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;font-size:16px}
+  .product-info{padding:16px;flex:1;display:flex;flex-direction:column}
+  .product-cat{font-size:11px;color:var(--green-600);font-weight:700;margin-bottom:6px}
+  .product-name{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:42px}
+  .product-desc{font-size:12px;color:var(--text-light);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px}
+  .product-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:end;gap:10px}
+  .price-now{font-size:18px;font-weight:800;color:var(--green-800)}
+  .price-old{font-size:12px;color:var(--text-light);text-decoration:line-through}
+  .add-btn{width:40px;height:40px;border-radius:50%;background:var(--green-800);color:#fff;display:grid;place-items:center;font-size:18px}
+  .stock-bar{height:4px;background:#F3F4F6;border-radius:999px;overflow:hidden;margin-top:12px}
+  .stock-fill{height:100%;border-radius:999px}
+  .stock-text{font-size:11px;color:var(--text-light);margin-top:6px;display:flex;justify-content:space-between}
+  .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .trust-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;gap:14px;align-items:center}
+  .trust-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+  .footer{background:var(--green-900);color:#fff;margin-top:60px}
+  .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;gap:40px;padding:56px 0 36px}
+  .footer h4{font-size:16px;font-weight:800;margin-bottom:18px}
+  .footer p,.footer li{font-size:14px;opacity:0.8;line-height:1.9}
+  .footer ul{list-style:none}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,0.1);padding:18px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:0.7;flex-wrap:wrap;gap:12px}
+  .overlay{position:fixed;inset:0;background:rgba(13,40,24,0.45);backdrop-filter:blur(6px);z-index:200;opacity:0;pointer-events:none;transition:.3s}
+  .overlay.open{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;bottom:0;left:0;width:min(440px,92vw);background:var(--cream);z-index:300;transform:translateX(-100%);transition:.4s;display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,0.2)}
+  .drawer.open{transform:translateX(0)}
+  .drawer-head{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#fff}
+  .drawer-body{flex:1;overflow:auto;padding:20px}
+  .drawer-foot{padding:20px;border-top:1px solid var(--border);background:#fff}
+  .modal{position:fixed;inset:0;z-index:300;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.3s;padding:20px}
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal-card{background:#fff;border-radius:28px;width:min(560px,100%);max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg);transform:translateY(20px) scale(0.98);transition:.4s}
+  .modal.open .modal-card{transform:translateY(0) scale(1)}
+  .modal-head{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center}
+  .modal-body{padding:24px}
+  .pdetail-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .pdetail-gallery{background:var(--paper);border-radius:20px;overflow:hidden;aspect-ratio:1/1}
+  .pdetail-gallery img{width:100%;height:100%;object-fit:cover}
+  .pdetail-thumbs{display:flex;gap:10px;margin-top:12px}
+  .pdetail-thumbs img{width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid transparent;cursor:pointer}
+  .pdetail-thumbs img.active{border-color:var(--green-700)}
+  .admin-layout{display:none;min-height:100vh;background:#F8FAF8}
+  .admin-layout.open{display:grid;grid-template-columns:280px 1fr}
+  .admin-sidebar{background:var(--green-900);color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+  .admin-nav{margin-top:32px;display:flex;flex-direction:column;gap:6px}
+  .admin-nav button{text-align:right;padding:12px 16px;border-radius:12px;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px}
+  .admin-nav button.active,.admin-nav button:hover{background:rgba(255,255,255,0.1);color:#fff}
+  .admin-main{padding:28px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px}
+  .stat-card h3{font-size:28px;font-weight:800;color:var(--green-800)}
+  .table-wrap{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden}
+  .table{width:100%;border-collapse:collapse}
+  .table th{font-size:12px;color:var(--text-light);font-weight:700;text-align:right;padding:14px 16px;background:var(--paper);border-bottom:1px solid var(--border)}
+  .table td{padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:13px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .form-group label{font-size:13px;font-weight:700;color:var(--green-900)}
+  .input{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;background:#fff}
+  .input:focus{border-color:var(--green-600);box-shadow:0 0 0 4px rgba(64,145,108,0.12)}
+  .hide{display:none !important}
+  .empty{text-align:center;padding:60px 20px;color:var(--text-light)}
+  .toast-container{position:fixed;bottom:20px;right:20px;z-index:600;display:flex;flex-direction:column;gap:10px}
+  .toast{background:var(--green-900);color:#fff;padding:14px 20px;border-radius:14px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;animation:slideIn .4s;max-width:380px}
+  @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+  .loading{display:grid;place-items:center;padding:40px;color:var(--text-light)}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--green-600);border-radius:50%;animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tracking-steps{display:flex;flex-direction:column;gap:0;position:relative;padding-right:32px}
+  .tracking-steps::before{content:'';position:absolute;right:11px;top:10px;bottom:10px;width:2px;background:#E5E7EB}
+  .tstep{position:relative;padding:14px 0;display:flex;gap:14px;align-items:flex-start}
+  .tstep-dot{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;display:grid;place-items:center;font-size:12px;flex-shrink:0;z-index:1}
+  .tstep.done .tstep-dot{background:var(--green-600);border-color:var(--green-600);color:#fff}
+  .tstep.active .tstep-dot{background:var(--orange-400);border-color:var(--orange-400);color:#fff;animation:pulse 2s infinite}
+  .chat-widget{position:fixed;bottom:24px;left:24px;z-index:400}
+  .chat-btn{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--green-700),var(--green-600));color:#fff;display:grid;place-items:center;font-size:28px;box-shadow:0 8px 24px rgba(27,67,50,0.3);transition:.3s;cursor:pointer;border:3px solid #fff}
+  .chat-window{position:absolute;bottom:80px;left:0;width:380px;max-width:92vw;height:520px;background:#fff;border-radius:24px;box-shadow:var(--shadow-lg);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px) scale(0.95);opacity:0;pointer-events:none;transition:.35s}
+  .chat-window.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+  .chat-header{background:linear-gradient(135deg,var(--green-900),var(--green-700));color:#fff;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
+  .chat-messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#F9FAFB}
+  .msg{max-width:80%;padding:10px 14px;border-radius:18px;font-size:13px;line-height:1.6}
+  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--green-700),var(--green-600));color:#fff;border-bottom-left-radius:6px}
+  .msg.admin{align-self:flex-start;background:#fff;border:1px solid var(--border);border-bottom-right-radius:6px;box-shadow:var(--shadow)}
+  .msg.system{align-self:center;background:var(--orange-50);border:1px dashed var(--orange-300);font-size:11px;color:var(--orange-600);border-radius:999px;padding:6px 12px}
+  .chat-input{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;background:#fff}
+  .chat-input input{flex:1;border:1.5px solid var(--border);border-radius:999px;padding:10px 16px;font-size:13px;outline:none}
+  .chat-input button{width:42px;height:42px;border-radius:50%;background:var(--green-800);color:#fff;display:grid;place-items:center}
+  #map{height:240px;border-radius:16px;border:1.5px solid var(--border)}
+  .map-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .category-hero{background:linear-gradient(135deg,var(--green-50),#fff);border:1px solid var(--green-100);border-radius:24px;padding:28px;display:flex;gap:24px;align-items:center}
+  .category-hero-icon{width:88px;height:88px;border-radius:20px;display:grid;place-items:center;font-size:42px;flex-shrink:0}
+  @media(max-width:1100px){.hero-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(2,1fr)}.product-grid{grid-template-columns:repeat(3,1fr)}.trust-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr}.admin-layout.open{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.header-main{flex-wrap:wrap}.search-box{order:3;max-width:100%}.product-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}.pdetail-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.chat-window{width:92vw;left:-8px}.chat-widget{left:12px;bottom:12px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <div style="display:flex;gap:18px"><span>🌿 ارسال رایگان بالای ۵۰۰ هزار تومان</span><span>🍯 عسل طبیعی و ارگانیک</span></div>
+    <div style="display:flex;gap:10px"><button onclick="openTracking()" style="background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:999px;font-size:11px">📦 پیگیری سفارش</button><span>athyar.com</span></div>
+  </div>
+</div>
+
+<header class="header">
+  <div class="container">
+    <div class="header-main">
+      <a class="logo" href="#" onclick="router('home')">
+        <div class="logo-mark">ا</div>
+        <div>اثیار<small>athyar.com - طعم اصیل طبیعت</small></div>
+      </a>
+      <div class="search-box">
+        <input id="searchInput" placeholder="جستجو در اثیار... عسل، میوه خشک، صنایع دستی، زعفران" oninput="onSearch(this.value)">
+        <button class="search-btn" onclick="focusSearch()">🔍</button>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="router('categories')" title="دسته‌بندی‌ها">📂</button>
+        <button class="icon-btn" onclick="toggleWishlist()">🤍<span class="badge" id="wishlistCount" style="display:none">0</span></button>
+        <button class="icon-btn" onclick="openCart()">🛒<span class="badge" id="cartCount">0</span></button>
+        <button class="user-btn" onclick="openUser()"><span id="userLabel">ورود / ثبت‌نام</span><div class="avatar" id="userAvatar">👤</div></button>
+      </div>
+    </div>
+    <nav class="nav" id="mainNav"></nav>
+  </div>
+</header>
+
+<main id="app">
+  <section id="page-home">
+    <div class="hero">
+      <div class="container">
+        <div class="hero-grid" id="heroGrid"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section">
+        <div class="section-head"><div><h2>دسته‌بندی‌های اثیار</h2><p>عسل طبیعی، میوه خشک، صنایع دستی و گیاهان دارویی</p></div><button class="btn btn-outline" onclick="router('categories')">همه دسته‌ها ←</button></div>
+        <div class="cat-grid" id="catGrid"></div>
+      </div>
+      <div class="section" style="padding-top:0">
+        <div class="section-head"><div><h2>🔥 پیشنهادهای ویژه اثیار</h2><p>منتخب محصولات با تخفیف ویژه</p></div><div style="background:var(--green-900);color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;display:flex;gap:8px"><span>⏳</span><span id="timerText">۰۲ : ۱۴ : ۳۵ : ۰۹</span></div></div>
+        <div class="product-grid" id="festivalGrid"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-chips">
+          <button class="chip active" data-filter="all" onclick="setFilter('all')">همه محصولات</button>
+          <button class="chip" data-filter="new" onclick="setFilter('new')">✨ جدید</button>
+          <button class="chip" data-filter="bestseller" onclick="setFilter('bestseller')">🔥 پرفروش</button>
+          <button class="chip" data-filter="discount" onclick="setFilter('discount')">🎁 تخفیف‌دار</button>
+          <button class="chip" data-filter="organic" onclick="setFilter('organic')">🌱 ارگانیک</button>
+        </div>
+        <select class="sort-select" id="sortSelect" onchange="setSort(this.value)"><option value="newest">جدیدترین</option><option value="cheapest">ارزان‌ترین</option><option value="expensive">گران‌ترین</option><option value="popular">محبوب‌ترین</option></select>
+      </div>
+      <div class="product-grid" id="productGrid"><div class="loading" style="grid-column:1/-1"><div class="spinner"></div><div style="margin-top:12px" class="fa-num">در حال بارگذاری محصولات اثیار...</div></div></div>
+      <div class="section">
+        <div class="trust-grid">
+          <div class="trust-card"><div class="trust-icon" style="background:#E0F2E9">🚚</div><div><h4 style="font-size:14px">ارسال سریع</h4><p style="font-size:12px;color:var(--text-light)">ارسال در همان روز</p></div></div>
+          <div class="trust-card"><div class="trust-icon" style="background:#FEF9C3">🍯</div><div><h4 style="font-size:14px">عسل طبیعی</h4><p style="font-size:12px;color:var(--text-light)">ضمانت اصالت و طبیعی</p></div></div>
+          <div class="trust-card"><div class="trust-icon" style="background:#E8F5E9">💬</div><div><h4 style="font-size:14px">مشاوره تخصصی</h4><p style="font-size:12px;color:var(--text-light)">پشتیبانی و مشاوره خرید</p></div></div>
+          <div class="trust-card"><div class="trust-icon" style="background:#FFF7ED">↩️</div><div><h4 style="font-size:14px">بازگشت ۷ روزه</h4><p style="font-size:12px;color:var(--text-light)">ضمانت رضایت</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-shop" class="hide">
+    <div class="container">
+      <div style="padding:24px 0;display:flex;justify-content:space-between;align-items:center"><h2 style="font-size:24px;font-weight:800">فروشگاه اثیار</h2><div style="font-size:13px;color:var(--text-light)"><span id="productCount" class="fa-num">۰</span> محصول</div></div>
+      <div class="filter-bar" style="position:static"><div class="filter-chips" id="shopFilterChips"></div><select class="sort-select" onchange="setSort(this.value)"><option value="newest">جدیدترین</option><option value="cheapest">ارزان‌ترین</option><option value="expensive">گران‌ترین</option><option value="popular">محبوب‌ترین</option></select></div>
+      <div class="product-grid" id="shopGrid"></div>
+    </div>
+  </section>
+
+  <section id="page-categories" class="hide">
+    <div class="container">
+      <div style="padding:24px 0"><h2 style="font-size:26px;font-weight:800;margin-bottom:8px">📂 دسته‌بندی‌های اثیار</h2><p style="color:var(--text-light);font-size:14px">عسل، میوه خشک، صنایع دستی و گیاهان دارویی - هر کدام داستانی از طبیعت</p></div>
+      <div id="categoriesPageGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px"></div>
+    </div>
+  </section>
+
+  <section id="page-tracking" class="hide">
+    <div class="container" style="max-width:720px">
+      <div style="padding:32px 0">
+        <h2 style="font-size:26px;font-weight:800;margin-bottom:8px">📦 پیگیری سفارش</h2>
+        <p style="color:var(--text-light);font-size:14px">کد رهگیری دریافتی را وارد کنید</p>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px;margin-top:20px">
+          <div class="form-grid"><div class="form-group"><label>کد رهگیری</label><input class="input fa-num" id="trackCode" placeholder="SHF..."></div><div class="form-group"><label>شماره موبایل (اختیاری)</label><input class="input fa-num" id="trackPhone" placeholder="۰۹۱۲..."></div></div>
+          <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="doTracking()">پیگیری سفارش 🔍</button>
+        </div>
+        <div id="trackingResult" style="margin-top:24px"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="color:#fff;margin-bottom:16px"><div class="logo-mark" style="background:linear-gradient(135deg,#FF9F1C,#E36414)">ا</div><div>اثیار<small style="color:rgba(255,255,255,0.6)">athyar.com</small></div></div>
+        <p>اثیار، عرضه‌کننده عسل طبیعی، میوه‌های خشک، صنایع دستی و گیاهان دارویی اصیل ایرانی. از دل طبیعت، برای زندگی سالم.</p>
+        <div style="display:flex;gap:10px;margin-top:18px"><span style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;display:grid;place-items:center">📷</span><span style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:50%;display:grid;place-items:center">💬</span></div>
+      </div>
+      <div><h4>دسته‌بندی‌ها</h4><ul id="footerCats"></ul></div>
+      <div><h4>خدمات مشتریان</h4><ul><li>راهنمای خرید</li><li>پیگیری سفارش</li><li>شرایط بازگشت</li><li>تماس با ما</li></ul></div>
+      <div>
+        <h4>اثیار</h4>
+        <p style="font-size:13px">هر هفته یک محصول جدید + تخفیف ویژه</p>
+        <div style="display:flex;gap:8px;margin-top:14px;background:rgba(255,255,255,0.1);padding:6px;border-radius:999px"><input placeholder="شماره موبایل" style="flex:1;background:transparent;border:none;color:#fff;outline:none;padding:8px 14px;font-size:13px"><button class="btn btn-primary" style="padding:10px 18px">عضویت</button></div>
+        <div style="margin-top:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:14px"><div style="font-size:13px;font-weight:700;margin-bottom:6px">📍 نشانی</div><div style="font-size:12px;opacity:0.7">تهران، بازار بزرگ - فروشگاه اینترنتی athyar.com</div></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© ۱۴۰۳ اثیار - athyar.com - تمامی حقوق محفوظ است 🌿</span><span style="display:flex;gap:12px"><a href="#" onclick="openAdminLogin()">ورود مدیر 🔐</a><span>•</span><span>پرداخت امن</span></span></div>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head"><h3 style="font-weight:800">سبد خرید 🛒</h3><button onclick="closeAll()" style="width:36px;height:36px;background:#F3F4F6;border-radius:50%">✕</button></div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</div>
+
+<div class="modal" id="productModal">
+  <div class="modal-card" style="width:min(920px,100%)">
+    <div class="modal-head"><div style="display:flex;align-items:center;gap:10px"><span class="cat-chip" id="pmodalCat">دمنوش</span><span id="pmodalStock" style="font-size:12px"></span></div><button onclick="closeAll()" style="width:36px;height:36px;background:#F3F4F6;border-radius:50%">✕</button></div>
+    <div class="modal-body">
+      <div class="pdetail-grid">
+        <div><div class="pdetail-gallery"><img id="pmodalImg" src=""></div><div class="pdetail-thumbs" id="pmodalThumbs"></div></div>
+        <div>
+          <h2 id="pmodalName" style="font-size:24px;font-weight:800;margin-bottom:8px"></h2>
+          <p id="pmodalDesc" style="color:var(--text-light);font-size:13px;line-height:1.8;margin-bottom:16px"></p>
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="pmodalBenefits"></div>
+          <div style="background:var(--green-50);border:1px solid var(--green-100);border-radius:16px;padding:14px;margin-bottom:16px"><div style="font-size:12px;font-weight:800;color:var(--green-800);margin-bottom:6px">🌿 نحوه مصرف</div><div id="pmodalUsage" style="font-size:13px;color:var(--green-800)"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><div><div id="pmodalPrice" style="font-size:24px;font-weight:800;color:var(--green-800)" class="fa-num"></div><div id="pmodalOldPrice" style="font-size:13px;color:var(--text-light);text-decoration:line-through" class="fa-num"></div></div><div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px"><button onclick="changeQty(-1)" style="width:32px;height:32px;background:#F3F4F6;border-radius:50%">−</button><span id="pmodalQty" style="min-width:24px;text-align:center;font-weight:800" class="fa-num">۱</span><button onclick="changeQty(1)" style="width:32px;height:32px;background:var(--green-800);color:#fff;border-radius:50%">+</button></div></div>
+          <button class="btn btn-primary" style="width:100%;padding:16px" onclick="addToCartFromModal()">افزودن به سبد - <span id="pmodalTotal" class="fa-num"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="userModal"><div class="modal-card"><div class="modal-head"><h3 style="font-weight:800" id="userModalTitle">ورود</h3><button onclick="closeAll()" style="width:36px;height:36px;background:#F3F4F6;border-radius:50%">✕</button></div><div class="modal-body" id="userModalBody"></div></div></div>
+
+<div class="modal" id="checkoutModal">
+  <div class="modal-card" style="width:min(720px,100%)">
+    <div class="modal-head"><h3 style="font-weight:800">📍 آدرس ارسال</h3><button onclick="closeAll()" style="width:36px;height:36px;background:#F3F4F6;border-radius:50%">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid"><div class="form-group"><label>نام و نام خانوادگی *</label><input class="input" id="cName" placeholder="مثلا: سارا رضایی"></div><div class="form-group"><label>شماره موبایل *</label><input class="input fa-num" id="cPhone" placeholder="۰۹۱۲..."></div></div>
+      <div class="form-grid"><div class="form-group"><label>استان *</label><select class="input" id="cProvince"><option value="">انتخاب استان</option><option>تهران</option><option>اصفهان</option><option>شیراز</option><option>خراسان رضوی</option><option>آذربایجان شرقی</option><option>خوزستان</option><option>گیلان</option><option>مازندران</option><option>البرز</option><option>قم</option><option>کردستان</option><option>کرمان</option></select></div><div class="form-group"><label>شهر *</label><input class="input" id="cCity" placeholder="مثلا: تهران"></div></div>
+      <div class="form-grid"><div class="form-group"><label>خیابان اصلی *</label><input class="input" id="cStreet" placeholder="مثلا: ولیعصر"></div><div class="form-group"><label>کوچه</label><input class="input" id="cAlley" placeholder="مثلا: کوچه ۱۲"></div></div>
+      <div class="form-grid"><div class="form-group"><label>پلاک *</label><input class="input fa-num" id="cPlaque" placeholder="۱۴۲"></div><div class="form-group"><label>واحد</label><input class="input fa-num" id="cUnit" placeholder="۳"></div></div>
+      <div class="form-group"><label>کد پستی *</label><input class="input fa-num" id="cPostal" placeholder="۱۰ رقمی"></div>
+      <div class="form-group"><label>آدرس کامل *</label><textarea class="input" id="cAddress" rows="2" placeholder="آدرس کامل..."></textarea></div>
+      <div class="form-group"><label>📍 موقعیت روی نقشه (اختیاری)</label><div id="map"></div><div class="map-actions"><button class="btn btn-outline" style="padding:8px 14px;font-size:12px" onclick="getCurrentLocation()">📍 موقعیت فعلی</button><button class="btn btn-outline" style="padding:8px 14px;font-size:12px" onclick="clearMap()">پاک کردن</button><span id="mapCoords" style="font-size:11px;color:var(--text-light)" class="fa-num">انتخاب نشده</span></div><div style="display:none"><input id="cLat"><input id="cLng"></div></div>
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px;margin:16px 0">
+        <h4 style="font-size:14px;font-weight:800;margin-bottom:12px">💳 روش پرداخت</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label style="border:2px solid var(--green-600);background:var(--green-50);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer" id="payOnlineLabel"><input type="radio" name="paymentMethod" value="online" checked onchange="updatePaymentMethod()"><div><div style="font-weight:700;font-size:13px">💳 پرداخت آنلاین</div><div style="font-size:11px;color:var(--text-light)">زرین‌پال</div></div></label>
+          <label style="border:1.5px solid var(--border);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer" id="payCodLabel"><input type="radio" name="paymentMethod" value="cod" onchange="updatePaymentMethod()"><div><div style="font-weight:700;font-size:13px">💵 پرداخت در محل</div><div style="font-size:11px;color:var(--text-light)">هنگام تحویل</div></div></label>
+        </div>
+      </div>
+      <div style="background:var(--paper);border-radius:16px;padding:14px;margin:16px 0"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>جمع سبد</span><span id="checkoutSubtotal" class="fa-num"></span></div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>هزینه ارسال</span><span style="color:var(--green-600)">رایگان 🌿</span></div><div style="display:flex;justify-content:space-between;font-weight:800;font-size:16px;border-top:1px dashed var(--border);padding-top:8px"><span>قابل پرداخت</span><span id="checkoutTotal" style="color:var(--green-800)" class="fa-num"></span></div></div>
+      <button class="btn btn-primary" style="width:100%;padding:16px" onclick="placeOrder()" id="placeOrderBtn">تایید و پرداخت آنلاین 🔒</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="trackingModal">
+  <div class="modal-card" style="width:min(600px,100%)">
+    <div class="modal-head"><h3 style="font-weight:800">📦 پیگیری سفارش</h3><button onclick="closeAll()" style="width:36px;height:36px;background:#F3F4F6;border-radius:50%">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid"><div class="form-group"><label>کد رهگیری</label><input class="input fa-num" id="trackCodeModal" placeholder="SHF..."></div><div class="form-group"><label>موبایل</label><input class="input fa-num" id="trackPhoneModal" placeholder="۰۹۱۲..."></div></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doTrackingModal()">پیگیری 🔍</button>
+      <div id="trackingResultModal" style="margin-top:20px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-layout" id="adminLayout">
+  <aside class="admin-sidebar">
+    <div class="logo" style="color:#fff"><div class="logo-mark">ا</div><div>اثیار<small style="color:rgba(255,255,255,0.6)">athyar.com - مدیریت</small></div></div>
+    <div class="admin-nav">
+      <button class="active" data-admin="dashboard" onclick="adminNav('dashboard')">📊 داشبورد</button>
+      <button data-admin="products" onclick="adminNav('products')">🌿 محصولات (<span id="adminProductCount">0</span>)</button>
+      <button data-admin="categories" onclick="adminNav('categories')">📂 دسته‌بندی‌ها</button>
+      <button data-admin="banners" onclick="adminNav('banners')">🖼️ بنرها</button>
+      <button data-admin="orders" onclick="adminNav('orders')">📦 سفارشات (<span id="adminOrderCount">0</span>)</button>
+      <button data-admin="payments" onclick="adminNav('payments')">💳 پرداخت‌ها</button>
+      <button data-admin="support" onclick="adminNav('support')">💬 مشاوره (<span id="adminChatCount">0</span>)</button>
+      <button onclick="closeAdmin()" style="margin-top:24px;background:rgba(255,255,255,0.08)">🚪 خروج</button>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div id="admin-dashboard"></div>
+    <div id="admin-products" class="hide"></div>
+    <div id="admin-categories" class="hide"></div>
+    <div id="admin-banners" class="hide"></div>
+    <div id="admin-orders" class="hide"></div>
+    <div id="admin-payments" class="hide"></div>
+    <div id="admin-support" class="hide"></div>
+    <div id="admin-users" class="hide"></div>
+    <div id="admin-festivals" class="hide"></div>
+    <div id="admin-sms" class="hide"></div>
+  </main>
+</div>
+
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header"><div style="display:flex;align-items:center;gap:10px"><div class="chat-status" id="chatStatus"></div><div><h4>💬 مشاوره اثیار</h4><p id="chatStatusText">آنلاین</p></div></div><button onclick="closeChatWidget()" style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:50%;color:#fff">✕</button></div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input" id="chatInputArea"><input id="chatInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()">📤</button></div>
+    <div id="chatRatingArea" class="hide" style="padding:16px;border-top:1px solid var(--border);background:#fff">
+      <h4 style="font-size:14px;font-weight:800;margin-bottom:10px">🌸 رضایت از مشاوره؟</h4>
+      <div style="display:flex;gap:6px;margin-bottom:12px" id="ratingStars"><button onclick="setRating(1)" style="font-size:24px">⭐</button><button onclick="setRating(2)" style="font-size:24px">⭐</button><button onclick="setRating(3)" style="font-size:24px">⭐</button><button onclick="setRating(4)" style="font-size:24px">⭐</button><button onclick="setRating(5)" style="font-size:24px">⭐</button></div>
+      <div class="form-group"><textarea class="input" id="feedbackText" rows="2" placeholder="نظر شما..."></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="submitRating()">ثبت رضایت ✅</button>
+    </div>
+  </div>
+  <div class="chat-btn" id="chatBtn" onclick="toggleChatWidget()">💬</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const persianDigits=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];const englishDigits=['0','1','2','3','4','5','6','7','8','9'];
+function toFaDigits(str){if(str==null)return'';let s=str.toString();for(let i=0;i<10;i++)s=s.replace(new RegExp(englishDigits[i],'g'),persianDigits[i]);return s;}
+function toEnDigits(str){if(!str)return str;let s=str.toString();for(let i=0;i<10;i++)s=s.replace(new RegExp(persianDigits[i],'g'),englishDigits[i]);const arabicDigits=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];for(let i=0;i<10;i++)s=s.replace(new RegExp(arabicDigits[i],'g'),englishDigits[i]);return s;}
+function formatPriceFa(price){if(!price&&price!==0)return'۰ تومان';let formatted=Number(price).toLocaleString('en-US');formatted=toFaDigits(formatted);return formatted+' تومان';}
+function formatNumberFa(num){return toFaDigits(num.toString());}
+
+const API_BASE='';let authToken=localStorage.getItem('attari_token')||null;let currentUser=JSON.parse(localStorage.getItem('attari_currentUser')||'null');
+function apiHeaders(isJson=true){const h={};if(isJson)h['Content-Type']='application/json';if(authToken)h['Authorization']='Bearer '+authToken;return h;}
+async function apiFetch(path,opts={}){const url=API_BASE+path;const res=await fetch(url,{...opts,headers:{...apiHeaders(opts.isJson!==false),...(opts.headers||{})}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'خطای سرور');return data;}
+
+let state={products:[],banners:[],categories:[],cart:JSON.parse(localStorage.getItem('attari_cart')||'[]'),wishlist:JSON.parse(localStorage.getItem('attari_wishlist')||'[]'),orders:[],filter:'all',sort:'newest',category:'all',search:'',currentProduct:null,qty:1,currentChat:null,chatRating:5,map:null,marker:null};
+function saveLocal(){localStorage.setItem('attari_cart',JSON.stringify(state.cart));localStorage.setItem('attari_wishlist',JSON.stringify(state.wishlist));if(authToken)localStorage.setItem('attari_token',authToken);if(currentUser)localStorage.setItem('attari_currentUser',JSON.stringify(currentUser));}
+function toast(msg,icon='🌿'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className='toast';t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;c.appendChild(t);setTimeout(()=>t.remove(),4000);}
+function calcDiscounted(p){return Math.round(p.price*(1-(p.discount||0)/100));}
+function parseProduct(p){return{...p,benefits:typeof p.benefits==='string'?JSON.parse(p.benefits||'[]'):(p.benefits||[]),images:typeof p.images==='string'?JSON.parse(p.images||'[]'):(p.images||[]),is_festival:!!p.is_festival,is_new:!!p.is_new,is_organic:!!p.is_organic,discount:p.discount||0};}
+
+async function loadAll(){
+  try{
+    const [productsRaw,banners,categories]=await Promise.all([apiFetch('/api/products').catch(()=>[]),apiFetch('/api/banners').catch(()=>[]),apiFetch('/api/categories').catch(()=>[])]);
+    state.products=productsRaw.map(parseProduct);state.banners=banners;state.categories=categories;
+    render();if(authToken)loadMyOrders();
+  }catch(e){console.error(e);}
+}
+async function loadMyOrders(){try{state.orders=await apiFetch('/api/orders/my');}catch(e){}}
+
+function render(){renderNav();renderHero();renderCategories();renderFestival();renderProducts();renderFooterCats();updateCartCount();updateWishlistCount();updateUserLabel();renderShop();renderCategoriesPage();if(document.getElementById('adminLayout').classList.contains('open'))renderAdmin();}
+function renderNav(){
+  const nav=document.getElementById('mainNav');const cats=state.categories;
+  nav.innerHTML=`<a class="${state.category==='all'?'active':''}" onclick="setCategory('all')">همه محصولات</a>`+cats.map(c=>`<a class="${state.category===c.id?'active':''}" onclick="setCategory('${c.id}')">${c.icon} ${c.name}</a>`).join('')+`<a onclick="router('categories')" style="margin-right:auto;background:var(--green-50);padding:6px 14px;border-radius:999px">📂 دسته‌بندی‌ها</a><a onclick="openTracking()" style="background:var(--orange-50);padding:6px 14px;border-radius:999px">📦 پیگیری</a>`;
+  const shopChips=document.getElementById('shopFilterChips');if(shopChips)shopChips.innerHTML=`<button class="chip ${state.category==='all'?'active':''}" onclick="setCategory('all')">همه</button>`+cats.map(c=>`<button class="chip ${state.category===c.id?'active':''}" onclick="setCategory('${c.id}')">${c.icon} ${c.name}</button>`).join('');
+}
+function renderHero(){
+  const grid=document.getElementById('heroGrid');
+  const mainBanner=state.banners.find(b=>b.active)||state.banners[0]||{title:'طعم اصیل طبیعت در اثیار',subtitle:'عسل، میوه خشک و گیاهان دارویی',description:'از زنبورستان‌های زاگرس تا باغ‌های ارگانیک',cta:'مشاهده محصولات',color:'green',image:''};
+  grid.innerHTML=`
+    <div class="hero-main">
+      <div class="hero-content">
+        <div class="hero-badge"><span class="dot"></span> ارسال امروز + ضمانت اصالت</div>
+        <h1>طعم اصیل طبیعت در <span>اثیار</span></h1>
+        <p>${mainBanner.description} - ${mainBanner.subtitle}. عسل طبیعی، میوه خشک، صنایع دستی و گیاهان دارویی اصیل ایرانی.</p>
+        <div class="hero-ctas"><button class="btn btn-primary" onclick="router('shop')">🌿 خرید از اثیار</button><button class="btn btn-ghost" onclick="openChatWidget()">💬 مشاوره خرید</button></div>
+        <div style="display:flex;gap:18px;margin-top:28px;font-size:13px;opacity:0.9"><span class="fa-num">✅ ${toFaDigits(state.products.length)} محصول</span><span>•</span><span>🍯 عسل طبیعی</span><span>•</span><span>🏺 صنایع دستی</span></div>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="banner-card orange">
+        ${mainBanner.image?`<img src="${mainBanner.image}" onerror="this.style.display='none'">`:''}
+        <div><h3>🎁 ${mainBanner.title}</h3><p>${mainBanner.subtitle}</p></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><button class="btn btn-primary" style="padding:10px 18px;font-size:13px" onclick="router('shop')">${mainBanner.cta}</button><span style="font-weight:800;color:var(--orange-600)" class="fa-num">${toFaDigits(state.products.filter(p=>p.is_festival).length)} پیشنهاد ویژه</span></div>
+      </div>
+      <div class="banner-card green">
+        <div><h3>🍯 عسل طبیعی + میوه خشک</h3><p>بسته‌های ویژه اثیار برای هدیه و پذیرایی سالم</p></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-primary" style="padding:10px 18px;font-size:13px" onclick="setCategory('honey')">عسل‌ها 🍯</button><button class="btn btn-outline" style="padding:10px 14px;font-size:12px" onclick="setCategory('dried-fruits')">میوه خشک 🍎</button></div>
+      </div>
+    </div>
+  `;
+}
+function renderCategories(){
+  const grid=document.getElementById('catGrid');
+  grid.innerHTML=state.categories.map(c=>`
+    <div class="cat-card" onclick="setCategory('${c.id}')">
+      <div class="cat-icon" style="background:${c.color}">${c.icon}</div>
+      <h4>${c.name}</h4>
+      <span class="fa-num">${toFaDigits(c.count||0)} محصول</span>
+      <div class="cat-desc">${c.description||''}</div>
+    </div>
+  `).join('');
+}
+function renderCategoriesPage(){
+  const grid=document.getElementById('categoriesPageGrid');if(!grid)return;
+  grid.innerHTML=state.categories.map(c=>`
+    <div class="category-hero" style="cursor:pointer" onclick="setCategory('${c.id}')">
+      <div class="category-hero-icon" style="background:${c.color}">${c.icon}</div>
+      <div style="flex:1"><h3 style="font-size:18px;font-weight:800;margin-bottom:6px">${c.name} <span class="fa-num" style="font-size:12px;background:var(--green-50);padding:2px 8px;border-radius:999px">${toFaDigits(c.count||0)} محصول</span></h3><p style="font-size:13px;color:var(--text-light);line-height:1.7">${c.description||''}</p><div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${state.products.filter(p=>p.category===c.id).slice(0,3).map(p=>`<span style="background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px;font-size:11px">${p.name.slice(0,20)}</span>`).join('')}</div></div><div style="font-size:20px">←</div>
+    </div>
+  `).join('');
+}
+function getFilteredProducts(list=state.products){
+  let filtered=[...list];
+  if(state.search){const q=state.search.toLowerCase();filtered=filtered.filter(p=>p.name.toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q));}
+  if(state.category!=='all')filtered=filtered.filter(p=>p.category===state.category);
+  if(state.filter==='new')filtered=filtered.filter(p=>p.is_new);
+  if(state.filter==='discount')filtered=filtered.filter(p=>(p.discount||0)>0);
+  if(state.filter==='bestseller')filtered=filtered.filter(p=>p.sales>100);
+  if(state.filter==='organic')filtered=filtered.filter(p=>p.is_organic);
+  if(state.sort==='cheapest')filtered.sort((a,b)=>calcDiscounted(a)-calcDiscounted(b));
+  if(state.sort==='expensive')filtered.sort((a,b)=>calcDiscounted(b)-calcDiscounted(a));
+  if(state.sort==='popular')filtered.sort((a,b)=>b.sales-a.sales);
+  if(state.sort==='newest')filtered.sort((a,b)=>b.id-a.id);
+  return filtered;
+}
+function productCard(p){
+  const discounted=calcDiscounted(p);const hasDiscount=(p.discount||0)>0;const stockPercent=Math.min(100,(p.stock/100)*100);const stockColor=p.stock<10?'#EF4444':p.stock<30?'#F59E0B':'var(--green-600)';const img=(p.images&&p.images[0])||'https://via.placeholder.com/400?text=🌿';
+  return`
+    <div class="product-card" onclick="openProduct(${p.id})">
+      <div class="product-img"><img src="${img}" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=🌿'"><div class="product-badges">${hasDiscount?`<span class="pbadge discount fa-num">-${toFaDigits(p.discount)}%</span>`:''}${p.is_new?`<span class="pbadge new">جدید ✨</span>`:''}${p.is_festival?`<span class="pbadge festival">ویژه 🎉</span>`:''}</div><div class="product-actions"><button class="paction" onclick="event.stopPropagation();toggleWishlistItem(${p.id})">${state.wishlist.includes(p.id)?'❤️':'🤍'}</button><button class="paction" onclick="event.stopPropagation();openProduct(${p.id})">👁️</button></div></div>
+      <div class="product-info"><div class="product-cat">${(state.categories.find(c=>c.id===p.category)?.name||p.category)} ${p.is_organic?'• 🌱 ارگانیک':''}</div><div class="product-name">${p.name}</div><div class="product-desc">${p.description||''}</div><div class="product-foot"><div class="price"><span class="price-now fa-num">${formatPriceFa(discounted)}</span>${hasDiscount?`<span class="price-old fa-num">${formatPriceFa(p.price)}</span>`:''}</div><button class="add-btn" onclick="event.stopPropagation();quickAdd(${p.id})">+</button></div><div class="stock-bar"><div class="stock-fill" style="width:${stockPercent}%;background:${stockColor}"></div></div><div class="stock-text"><span>${p.stock<10?'🔥 در حال اتمام!':`موجودی: ${toFaDigits(p.stock)} عدد`}</span><span class="fa-num">فروش: ${toFaDigits(p.sales)}</span></div></div>
+    </div>
+  `;
+}
+function renderProducts(){const grid=document.getElementById('productGrid');const filtered=getFilteredProducts();grid.innerHTML=filtered.length?filtered.map(productCard).join(''):`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><h3>محصولی یافت نشد</h3></div>`;const countEl=document.getElementById('productCount');if(countEl)countEl.textContent=toFaDigits(filtered.length);}
+function renderFestival(){const grid=document.getElementById('festivalGrid');const fest=state.products.filter(p=>p.is_festival).slice(0,4);grid.innerHTML=fest.length?fest.map(productCard).join(''):'<div class="empty" style="grid-column:1/-1;padding:20px"><p>به زودی محصولات ویژه اضافه می‌شود</p></div>';}
+function renderShop(){const grid=document.getElementById('shopGrid');if(!grid)return;const filtered=getFilteredProducts();grid.innerHTML=filtered.map(productCard).join('')||`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🌿</div><h3>محصولی در این دسته نیست</h3></div>`;}
+function renderFooterCats(){const ul=document.getElementById('footerCats');if(ul)ul.innerHTML=state.categories.map(c=>`<li>${c.icon} ${c.name} <span class="fa-num">(${toFaDigits(c.count||0)})</span></li>`).join('');}
+
+function setCategory(cat){state.category=cat;renderNav();renderProducts();renderShop();router('shop');window.scrollTo({top:0,behavior:'smooth'});}
+function setFilter(f){state.filter=f;document.querySelectorAll('.chip').forEach(ch=>ch.classList.toggle('active',ch.dataset.filter===f));renderProducts();renderShop();}
+function setSort(s){state.sort=s;renderProducts();renderShop();}
+function onSearch(v){state.search=v;renderProducts();renderShop();}
+function focusSearch(){document.getElementById('searchInput').focus();}
+function router(page){document.getElementById('page-home').classList.toggle('hide',page!=='home');document.getElementById('page-shop').classList.toggle('hide',page!=='shop');document.getElementById('page-categories').classList.toggle('hide',page!=='categories');document.getElementById('page-tracking').classList.toggle('hide',page!=='tracking');if(page==='home')window.scrollTo({top:0,behavior:'smooth'});}
+
+function openProduct(id){
+  const p=state.products.find(x=>x.id===id);if(!p)return;state.currentProduct=p;state.qty=1;
+  document.getElementById('pmodalCat').textContent=state.categories.find(c=>c.id===p.category)?.name||p.category;
+  document.getElementById('pmodalStock').textContent=p.stock>0?`✅ ${toFaDigits(p.stock)} عدد موجود`:'❌ ناموجود';
+  document.getElementById('pmodalName').textContent=p.name;
+  document.getElementById('pmodalDesc').textContent=p.description||'';
+  const img=(p.images&&p.images[0])||'';document.getElementById('pmodalImg').src=img;
+  document.getElementById('pmodalThumbs').innerHTML=(p.images||[]).map((img,i)=>`<img src="${img}" class="${i===0?'active':''}" onclick="setPmodalImg('${img}',this)">`).join('');
+  document.getElementById('pmodalBenefits').innerHTML=(p.benefits||[]).map(b=>`<span style="background:var(--green-50);border:1px solid var(--green-100);padding:4px 10px;border-radius:999px;font-size:11px">✨ ${b}</span>`).join('');
+  document.getElementById('pmodalUsage').textContent=p.usage_text||p.usage||'';
+  const discounted=calcDiscounted(p);
+  document.getElementById('pmodalPrice').textContent=formatPriceFa(discounted);
+  document.getElementById('pmodalOldPrice').textContent=p.discount?formatPriceFa(p.price):'';
+  updatePmodalTotal();openModal('productModal');
+}
+function setPmodalImg(src,el){document.getElementById('pmodalImg').src=src;document.querySelectorAll('#pmodalThumbs img').forEach(i=>i.classList.remove('active'));if(el)el.classList.add('active');}
+function changeQty(d){if(!state.currentProduct)return;state.qty=Math.max(1,Math.min(state.currentProduct.stock,state.qty+d));document.getElementById('pmodalQty').textContent=toFaDigits(state.qty);updatePmodalTotal();}
+function updatePmodalTotal(){if(!state.currentProduct)return;const total=calcDiscounted(state.currentProduct)*state.qty;document.getElementById('pmodalTotal').textContent=formatPriceFa(total);document.getElementById('pmodalQty').textContent=toFaDigits(state.qty);}
+function addToCartFromModal(){if(!state.currentProduct)return;const existing=state.cart.find(i=>i.id===state.currentProduct.id);if(existing)existing.qty+=state.qty;else state.cart.push({id:state.currentProduct.id,qty:state.qty,name:state.currentProduct.name,price:calcDiscounted(state.currentProduct)});saveLocal();updateCartCount();renderCart();toast(`${state.currentProduct.name} به سبد اضافه شد`,'🛒');closeAll();}
+function quickAdd(id){const p=state.products.find(x=>x.id===id);const existing=state.cart.find(i=>i.id===id);if(existing)existing.qty+=1;else state.cart.push({id,qty:1,name:p.name,price:calcDiscounted(p)});saveLocal();updateCartCount();renderCart();toast(`${p.name} اضافه شد`,'🛒');}
+
+function openCart(){renderCart();openDrawer('cartDrawer');}
+function renderCart(){
+  const body=document.getElementById('cartBody');const foot=document.getElementById('cartFoot');
+  if(state.cart.length===0){body.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><h3>سبد خرید خالی است</h3><button class="btn btn-primary" style="margin-top:16px" onclick="closeAll();router('shop')">🌿 شروع خرید</button></div>`;foot.innerHTML='';return;}
+  let subtotal=0;
+  body.innerHTML=state.cart.map(item=>{const p=state.products.find(x=>x.id===item.id);const prod=p||item;const price=p?calcDiscounted(p):(item.price||0);const img=p&&p.images?p.images[0]:'https://via.placeholder.com/400?text=🌿';subtotal+=price*item.qty;return`<div style="display:flex;gap:14px;padding:14px;background:#fff;border:1px solid var(--border);border-radius:16px;margin-bottom:12px"><img src="${img}" style="width:72px;height:72px;border-radius:12px;object-fit:cover"><div style="flex:1"><div style="font-size:13px;font-weight:700">${prod.name}</div><div style="font-size:12px;color:var(--text-light)" class="fa-num">${formatPriceFa(price)} × ${toFaDigits(item.qty)}</div><div style="display:flex;gap:8px;margin-top:8px"><button onclick="updateCartQty(${item.id},-1)" style="width:28px;height:28px;background:#F3F4F6;border-radius:50%">−</button><span style="min-width:20px;text-align:center;font-weight:700" class="fa-num">${toFaDigits(item.qty)}</span><button onclick="updateCartQty(${item.id},1)" style="width:28px;height:28px;background:var(--green-800);color:#fff;border-radius:50%">+</button><button onclick="removeCart(${item.id})" style="margin-right:auto;color:#EF4444;font-size:12px">حذف 🗑️</button></div></div></div>`;}).join('');
+  foot.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px"><span>جمع کل</span><strong class="fa-num">${formatPriceFa(subtotal)}</strong></div><button class="btn btn-primary" style="width:100%;padding:16px" onclick="openCheckout()">ادامه و ثبت آدرس →</button>`;
+}
+function updateCartQty(id,d){const item=state.cart.find(i=>i.id===id);if(!item)return;item.qty+=d;if(item.qty<=0)state.cart=state.cart.filter(i=>i.id!==id);saveLocal();renderCart();updateCartCount();}
+function removeCart(id){state.cart=state.cart.filter(i=>i.id!==id);saveLocal();renderCart();updateCartCount();}
+function updateCartCount(){const count=state.cart.reduce((s,i)=>s+i.qty,0);document.getElementById('cartCount').textContent=toFaDigits(count);document.getElementById('cartCount').style.display=count>0?'grid':'none';}
+function toggleWishlistItem(id){if(state.wishlist.includes(id))state.wishlist=state.wishlist.filter(x=>x!==id);else state.wishlist.push(id);saveLocal();updateWishlistCount();renderProducts();renderShop();toast(state.wishlist.includes(id)?'به علاقه‌مندی‌ها اضافه شد':'حذف شد',state.wishlist.includes(id)?'❤️':'🤍');}
+function updateWishlistCount(){const c=document.getElementById('wishlistCount');c.textContent=toFaDigits(state.wishlist.length);c.style.display=state.wishlist.length>0?'grid':'none';}
+function toggleWishlist(){if(state.wishlist.length===0){toast('لیست خالی است','🤍');return;}const filtered=state.products.filter(p=>state.wishlist.includes(p.id));document.getElementById('productGrid').innerHTML=filtered.map(productCard).join('');router('home');window.scrollTo({top:600,behavior:'smooth'});}
+
+function openUser(){if(currentUser&&authToken){renderUserPanel();}else{renderLogin();}openModal('userModal');}
+function renderLogin(){
+  document.getElementById('userModalTitle').textContent='ورود به اثیار 📱';
+  document.getElementById('userModalBody').innerHTML=`<div style="text-align:center;margin-bottom:20px"><div style="width:72px;height:72px;background:linear-gradient(135deg,var(--green-50),var(--green-100));border-radius:20px;display:grid;place-items:center;margin:0 auto 12px;font-size:32px">🍯</div><p style="font-size:13px;color:var(--text-light)">برای خرید از اثیار شماره موبایل خود را وارد کنید</p></div><div class="form-group"><label>شماره موبایل</label><input class="input fa-num" id="loginPhone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" style="text-align:left;direction:ltr"></div><button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="sendOtp()">ارسال کد تایید ✨</button><div style="margin-top:12px;background:var(--paper);border-radius:12px;padding:10px;font-size:11px;text-align:center">کد تست: ۱۲۳۴</div>`;
+}
+async function sendOtp(){
+  const phoneRaw=document.getElementById('loginPhone').value.trim();const phone=toEnDigits(phoneRaw);
+  if(phone.length<10){toast('شماره معتبر وارد کنید','⚠️');return;}
+  try{const res=await apiFetch('/api/auth/send-otp',{method:'POST',body:JSON.stringify({phone})});toast('کد ارسال شد','📩');document.getElementById('userModalBody').innerHTML=`<div style="text-align:center;margin-bottom:20px"><div style="font-size:32px">📩</div><h3 style="margin:8px 0">کد تایید ارسال شد</h3><p style="font-size:13px;color:var(--text-light)">کد به ${toFaDigits(phone)} ارسال شد</p></div><div class="form-group"><label>کد تایید</label><input class="input fa-num" id="otpInput" placeholder="۱۲۳۴" style="text-align:center;letter-spacing:6px;font-size:20px;font-weight:800"></div><button class="btn btn-primary" style="width:100%" onclick="verifyOtp('${phone}')">تایید و ورود 🌿</button>`;}catch(e){toast(e.message,'❌');}
+}
+async function verifyOtp(phone){
+  const code=toEnDigits(document.getElementById('otpInput').value.trim());
+  try{const res=await apiFetch('/api/auth/verify-otp',{method:'POST',body:JSON.stringify({phone,code})});authToken=res.token;currentUser=res.user;saveLocal();updateUserLabel();loadMyOrders();toast(`خوش آمدی ${res.user.name}`,'✨');renderUserPanel();}catch(e){toast(e.message,'❌');}
+}
+function renderUserPanel(){
+  const u=currentUser;const orders=state.orders;
+  document.getElementById('userModalTitle').textContent=`حساب کاربری ${u.name}`;
+  document.getElementById('userModalBody').innerHTML=`
+    <div style="display:flex;gap:12px;align-items:center;background:var(--green-50);border:1px solid var(--green-100);border-radius:16px;padding:14px;margin-bottom:18px">
+      <div class="avatar" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--green-700),var(--green-600));display:grid;place-items:center;color:#fff;font-weight:800">${u.name[0]}</div>
+      <div><div style="font-weight:800">${u.name} ${u.role==='admin'?'👑':''}</div><div style="font-size:12px;color:var(--text-light)" class="fa-num">${toFaDigits(u.phone)}</div></div>
+      <button onclick="logout()" style="margin-right:auto;background:#fff;border:1px solid var(--border);padding:6px 12px;border-radius:999px;font-size:12px">خروج</button>
+    </div>
+    <h4 style="font-weight:800;margin-bottom:10px">📦 سفارشات شما</h4>
+    ${orders.length?orders.slice(0,5).map(o=>`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:8px"><div style="display:flex;justify-content:space-between"><div style="font-size:13px;font-weight:700" class="fa-num">#${o.tracking_code||o.id.toString().slice(-6)} - ${o.status}</div><span style="background:var(--green-50);color:var(--green-800);padding:4px 10px;border-radius:999px;font-size:11px" class="fa-num">${toFaDigits(JSON.parse(o.items||'[]').length||0)} قلم</span></div><div style="font-size:11px;color:var(--text-light)" class="fa-num">${new Date(o.created_at).toLocaleDateString('fa-IR')} - ${formatPriceFa(o.total)}</div><button class="btn btn-outline" style="padding:6px 12px;font-size:11px;margin-top:8px;width:100%" onclick="trackOrderByCode('${o.tracking_code}')">پیگیری 📦</button></div>`).join(''):`<div class="empty" style="padding:20px"><p>سفارشی نیست</p></div>`}
+  `;
+}
+function logout(){authToken=null;currentUser=null;localStorage.removeItem('attari_token');localStorage.removeItem('attari_currentUser');state.orders=[];updateUserLabel();closeAll();toast('خروج موفق','👋');}
+function updateUserLabel(){const label=document.getElementById('userLabel');const avatar=document.getElementById('userAvatar');if(currentUser){label.textContent=currentUser.name;avatar.textContent=currentUser.name[0];}else{label.textContent='ورود / ثبت‌نام';avatar.textContent='👤';}}
+
+function initMap(){if(state.map)return;const defaultLat=35.6892;const defaultLng=51.3890;state.map=L.map('map').setView([defaultLat,defaultLng],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(state.map);state.map.on('click',function(e){setMapMarker(e.latlng.lat,e.latlng.lng);});}
+function setMapMarker(lat,lng){document.getElementById('cLat').value=lat;document.getElementById('cLng').value=lng;document.getElementById('mapCoords').textContent=`مختصات: ${toFaDigits(lat.toFixed(5))} , ${toFaDigits(lng.toFixed(5))}`;if(state.marker)state.map.removeLayer(state.marker);state.marker=L.marker([lat,lng]).addTo(state.map);state.map.setView([lat,lng],15);}
+function getCurrentLocation(){if(!navigator.geolocation){toast('مرورگر پشتیبانی نمی‌کند','⚠️');return;}toast('در حال دریافت موقعیت...','📍');navigator.geolocation.getCurrentPosition(pos=>{setMapMarker(pos.coords.latitude,pos.coords.longitude);toast('موقعیت ثبت شد','✅');},err=>{toast('خطا: '+err.message,'❌');});}
+function clearMap(){if(state.marker)state.map.removeLayer(state.marker);state.marker=null;document.getElementById('cLat').value='';document.getElementById('cLng').value='';document.getElementById('mapCoords').textContent='انتخاب نشده';}
+function updatePaymentMethod(){
+  const method=document.querySelector('input[name="paymentMethod"]:checked')?.value||'online';
+  const btn=document.getElementById('placeOrderBtn');
+  const payOnlineLabel=document.getElementById('payOnlineLabel');
+  const payCodLabel=document.getElementById('payCodLabel');
+  if(method==='online'){btn.textContent='تایید و پرداخت آنلاین 🔒';payOnlineLabel.style.borderColor='var(--green-600)';payOnlineLabel.style.background='var(--green-50)';payCodLabel.style.borderColor='var(--border)';payCodLabel.style.background='#fff';}
+  else{btn.textContent='ثبت سفارش با پرداخت در محل 💵';payCodLabel.style.borderColor='var(--green-600)';payCodLabel.style.background='var(--green-50)';payOnlineLabel.style.borderColor='var(--border)';payOnlineLabel.style.background='#fff';}
+}
+function openCheckout(){
+  if(state.cart.length===0){toast('سبد خالی است','🛒');return;}
+  if(!authToken){toast('ابتدا وارد شوید','📱');openUser();return;}
+  const subtotal=state.cart.reduce((s,i)=>{const p=state.products.find(x=>x.id===i.id);return s+(p?calcDiscounted(p):i.price)*i.qty;},0);
+  document.getElementById('checkoutSubtotal').textContent=formatPriceFa(subtotal);
+  document.getElementById('checkoutTotal').textContent=formatPriceFa(subtotal);
+  document.getElementById('cName').value=currentUser.name;
+  document.getElementById('cPhone').value=toFaDigits(currentUser.phone);
+  openModal('checkoutModal');
+  setTimeout(()=>{initMap();if(state.map)state.map.invalidateSize();},300);
+}
+async function placeOrder(){
+  const name=document.getElementById('cName').value.trim();
+  const phone=toEnDigits(document.getElementById('cPhone').value.trim());
+  const province=document.getElementById('cProvince').value;
+  const city=document.getElementById('cCity').value.trim();
+  const street=document.getElementById('cStreet').value.trim();
+  const alley=document.getElementById('cAlley').value.trim();
+  const plaque=toEnDigits(document.getElementById('cPlaque').value.trim());
+  const unit=toEnDigits(document.getElementById('cUnit').value.trim());
+  const postal=toEnDigits(document.getElementById('cPostal').value.trim());
+  const address=document.getElementById('cAddress').value.trim();
+  const lat=document.getElementById('cLat').value?parseFloat(document.getElementById('cLat').value):null;
+  const lng=document.getElementById('cLng').value?parseFloat(document.getElementById('cLng').value):null;
+  const paymentMethod=document.querySelector('input[name="paymentMethod"]:checked')?.value||'online';
+  if(!name||!phone||!province||!city||!street||!plaque||!postal||!address){toast('فیلدهای ستاره‌دار را پر کنید','⚠️');return;}
+  const subtotal=state.cart.reduce((s,i)=>{const p=state.products.find(x=>x.id===i.id);return s+(p?calcDiscounted(p):i.price)*i.qty;},0);
+  const btn=document.getElementById('placeOrderBtn');btn.disabled=true;btn.textContent='⏳ در حال ثبت...';
+  try{
+    const order=await apiFetch('/api/orders',{method:'POST',body:JSON.stringify({name,phone,province,city,street,alley,plaque,unit,postal,address,lat,lng,items:state.cart.map(i=>({id:i.id,qty:i.qty})),total:subtotal,paymentMethod})});
+    if(order.payment&&order.payment.url&&paymentMethod==='online'){
+      const html=`<div style="text-align:center;padding:20px"><div style="width:80px;height:80px;background:var(--green-50);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:40px">💳</div><h3 style="font-weight:800;margin-bottom:8px">سفارش ثبت شد</h3><div style="background:var(--green-900);color:#fff;padding:10px 20px;border-radius:12px;font-size:18px;font-weight:800;margin-bottom:16px" class="fa-num">${order.tracking_code}</div><div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:1" onclick="window.location.href='${order.payment.url}'">پرداخت 💳</button><button class="btn btn-outline" style="flex:1" onclick="closeAll();trackOrderByCode('${order.tracking_code}')">بعدا</button></div></div>`;
+      document.getElementById('userModalBody').innerHTML=html;document.getElementById('userModalTitle').textContent='💳 پرداخت';closeAll();openModal('userModal');
+      if(!order.payment.isDemo){setTimeout(()=>{window.location.href=order.payment.url;},1500);}
+      toast(`سفارش ${order.tracking_code} ثبت شد`,'💳');
+    }else{
+      state.cart=[];saveLocal();updateCartCount();renderCart();await loadAll();closeAll();
+      const html=`<div style="text-align:center;padding:20px"><div style="width:80px;height:80px;background:var(--green-50);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:40px">🎉</div><h3 style="font-weight:800;margin-bottom:8px">سفارش ثبت شد!</h3><div style="background:var(--green-900);color:#fff;padding:12px 20px;border-radius:12px;font-size:20px;font-weight:800;margin-bottom:16px" class="fa-num">${order.tracking_code}</div><div style="display:flex;gap:10px;margin-top:20px"><button class="btn btn-primary" style="flex:1" onclick="closeAll();trackOrderByCode('${order.tracking_code}')">پیگیری 📦</button><button class="btn btn-outline" style="flex:1" onclick="closeAll()">بستن</button></div></div>`;
+      document.getElementById('userModalBody').innerHTML=html;document.getElementById('userModalTitle').textContent='✅ سفارش ثبت شد';openModal('userModal');toast(`سفارش ${order.tracking_code} ثبت شد`,'🎉');
+    }
+  }catch(e){toast(e.message,'❌');btn.disabled=false;updatePaymentMethod();}
+}
+function handlePaymentCallback(){
+  const hash=window.location.hash;
+  if(hash.includes('payment-success')){
+    const params=new URLSearchParams(hash.split('?')[1]||'');const tracking=params.get('tracking');const ref=params.get('ref');
+    const html=`<div style="text-align:center;padding:24px"><div style="width:88px;height:88px;background:#DCFCE7;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:48px">✅</div><h2 style="font-weight:800;color:var(--green-800);margin-bottom:8px">پرداخت موفق!</h2>${tracking?`<div style="background:var(--green-50);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-size:12px">کد رهگیری</div><div style="font-weight:800;font-size:18px" class="fa-num">${tracking}</div></div>`:''}${ref?`<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:16px"><div style="font-size:12px">شماره تراکنش</div><div style="font-weight:800" class="fa-num">${ref}</div></div>`:''}<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:1" onclick="closeAll();if('${tracking}')trackOrderByCode('${tracking}')">پیگیری 📦</button><button class="btn btn-outline" style="flex:1" onclick="closeAll();router('home')">خانه</button></div></div>`;
+    document.getElementById('userModalBody').innerHTML=html;document.getElementById('userModalTitle').textContent='✅ پرداخت موفق';openModal('userModal');state.cart=[];saveLocal();updateCartCount();window.history.replaceState(null,'',window.location.pathname);
+  }else if(hash.includes('payment-failed')){
+    const params=new URLSearchParams(hash.split('?')[1]||'');const tracking=params.get('tracking');
+    const html=`<div style="text-align:center;padding:24px"><div style="width:88px;height:88px;background:#FEF2F2;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:48px">❌</div><h2 style="font-weight:800;color:#EF4444;margin-bottom:8px">پرداخت ناموفق</h2>${tracking?`<div style="background:var(--paper);border-radius:12px;padding:12px;margin-bottom:16px"><div style="font-size:12px">کد سفارش محفوظ است:</div><div style="font-weight:800" class="fa-num">${tracking}</div></div>`:''}<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:1" onclick="closeAll();openCart()">تلاش مجدد 💳</button><button class="btn btn-outline" style="flex:1" onclick="closeAll()">بستن</button></div></div>`;
+    document.getElementById('userModalBody').innerHTML=html;document.getElementById('userModalTitle').textContent='❌ پرداخت ناموفق';openModal('userModal');window.history.replaceState(null,'',window.location.pathname);
+  }
+}
+
+function openTracking(){router('tracking');window.scrollTo({top:0,behavior:'smooth'});}
+async function doTracking(){
+  const code=toEnDigits(document.getElementById('trackCode').value.trim()).toUpperCase();const phone=toEnDigits(document.getElementById('trackPhone').value.trim());
+  if(!code){toast('کد رهگیری را وارد کنید','⚠️');return;}
+  try{const data=await apiFetch('/api/orders/track',{method:'POST',body:JSON.stringify({tracking_code:code,phone:phone||undefined})});showTrackingResult(data,'trackingResult');}catch(e){document.getElementById('trackingResult').innerHTML=`<div style="background:#FEF2F2;color:#EF4444;padding:14px;border-radius:12px">❌ ${e.message}</div>`;}
+}
+async function doTrackingModal(){
+  const code=toEnDigits(document.getElementById('trackCodeModal').value.trim()).toUpperCase();const phone=toEnDigits(document.getElementById('trackPhoneModal').value.trim());
+  if(!code){toast('کد الزامی','⚠️');return;}
+  try{const data=await apiFetch('/api/orders/track',{method:'POST',body:JSON.stringify({tracking_code:code,phone:phone||undefined})});showTrackingResult(data,'trackingResultModal');}catch(e){document.getElementById('trackingResultModal').innerHTML=`<div style="background:#FEF2F2;color:#EF4444;padding:14px;border-radius:12px">❌ ${e.message}</div>`;}
+}
+function trackOrderByCode(code){router('tracking');document.getElementById('trackCode').value=code;doTracking();window.scrollTo({top:0,behavior:'smooth'});}
+function showTrackingResult(order,elementId){
+  const el=document.getElementById(elementId);const items=typeof order.items==='string'?JSON.parse(order.items):order.items;const history=order.history||[{status:order.status,date:order.created_at,done:true,desc:'وضعیت فعلی'}];
+  el.innerHTML=`<div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-weight:800" class="fa-num">سفارش ${order.tracking_code}</h3><span style="background:var(--green-50);color:var(--green-800);padding:6px 12px;border-radius:999px;font-size:12px">${order.status}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;font-size:13px"><div><strong>نام:</strong> ${order.name}</div><div><strong>موبایل:</strong> <span class="fa-num">${toFaDigits(order.phone)}</span></div><div><strong>استان/شهر:</strong> ${order.province||''} / ${order.city||''}</div><div><strong>مبلغ:</strong> <span class="fa-num">${formatPriceFa(order.total)}</span></div><div style="grid-column:1/-1"><strong>آدرس:</strong> ${order.province||''}، ${order.city||''}، ${order.street||''}، پلاک ${toFaDigits(order.plaque||'')} - ${order.address}</div>${order.lat?`<div style="grid-column:1/-1"><a href="https://www.google.com/maps?q=${order.lat},${order.lng}" target="_blank" style="color:var(--green-600)">🗺️ مشاهده روی نقشه</a></div>`:''}</div><h4 style="font-weight:800;margin-bottom:12px">📍 مراحل</h4><div class="tracking-steps">${history.map(h=>`<div class="tstep ${h.done?'done':''} ${h.status===order.status?'active':''}"><div class="tstep-dot">${h.done?'✓':'○'}</div><div style="flex:1"><div style="font-weight:700;font-size:14px">${h.status}</div><div style="font-size:12px;color:var(--text-light)">${h.desc}</div></div></div>`).join('')}</div></div>`;
+}
+
+let chatPollInterval=null;
+function openChatWidget(){document.getElementById('chatWindow').classList.add('open');if(!authToken){document.getElementById('chatMessages').innerHTML=`<div class="msg system">برای شروع چت وارد شوید 📱</div><button class="btn btn-primary" style="margin:12px auto;display:block;padding:8px 16px;font-size:12px" onclick="openUser()">ورود</button>`;return;}if(!state.currentChat){startNewChat();}else{renderChatMessages();}}
+function closeChatWidget(){document.getElementById('chatWindow').classList.remove('open');}
+function toggleChatWidget(){const win=document.getElementById('chatWindow');if(win.classList.contains('open'))closeChatWidget();else openChatWidget();}
+async function startNewChat(){
+  try{
+    document.getElementById('chatMessages').innerHTML='<div class="loading"><div class="spinner"></div><div style="margin-top:8px;font-size:12px">در حال اتصال...</div></div>';
+    const myChats=await apiFetch('/api/support/my').catch(()=>[]);const openChat=myChats.find(c=>c.status==='waiting'||c.status==='active');
+    if(openChat){state.currentChat=openChat;renderChatMessages();return;}
+    const chat=await apiFetch('/api/support/start',{method:'POST',body:JSON.stringify({subject:'مشاوره خرید',message:'سلام، نیاز به مشاوره دارم 🌿'})});state.currentChat=chat;renderChatMessages();toast('به مشاوره متصل شدید','💬');
+  }catch(e){document.getElementById('chatMessages').innerHTML=`<div class="msg system">❌ ${e.message}</div>`;}
+}
+function renderChatMessages(){
+  const chat=state.currentChat;if(!chat)return;
+  const statusEl=document.getElementById('chatStatus');const statusText=document.getElementById('chatStatusText');
+  if(chat.status==='waiting'){statusEl.style.background='var(--orange-400)';statusText.textContent='در انتظار... ⏳';}else if(chat.status==='active'){statusEl.style.background='#22C55E';statusText.textContent='آنلاین ✅';}else{statusEl.style.background='#6B7280';statusText.textContent='بسته شد';}
+  const msgsEl=document.getElementById('chatMessages');
+  msgsEl.innerHTML=(chat.messages||[]).map(m=>{const time=new Date(m.created_at).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});if(m.sender==='system')return`<div class="msg system">${m.message}</div>`;return`<div class="msg ${m.sender}">${m.message}<span style="font-size:10px;opacity:0.7;display:block;margin-top:4px" class="fa-num">${toFaDigits(time)} - ${m.sender_name}</span></div>`;}).join('')+(chat.status==='waiting'?`<div class="msg system">⏳ منتظر پاسخ باشید...</div>`:'');
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+  if(chat.status==='closed'){document.getElementById('chatInputArea').classList.add('hide');document.getElementById('chatRatingArea').classList.remove('hide');}else{document.getElementById('chatInputArea').classList.remove('hide');document.getElementById('chatRatingArea').classList.add('hide');}
+  if(chatPollInterval)clearInterval(chatPollInterval);
+  if(chat.status!=='closed'){chatPollInterval=setInterval(async()=>{try{const updated=await apiFetch(`/api/support/${chat.id}`);if(updated.messages.length!==state.currentChat.messages.length||updated.status!==state.currentChat.status){state.currentChat=updated;renderChatMessages();}}catch(e){}},3000);}
+}
+async function sendChatMessage(){
+  const input=document.getElementById('chatInput');const msg=input.value.trim();if(!msg||!state.currentChat)return;input.value='';
+  const msgsEl=document.getElementById('chatMessages');msgsEl.innerHTML+=`<div class="msg user">${msg}</div>`;msgsEl.scrollTop=msgsEl.scrollHeight;
+  try{const res=await apiFetch(`/api/support/${state.currentChat.id}/message`,{method:'POST',body:JSON.stringify({message:msg})});state.currentChat.messages=res.messages;renderChatMessages();}catch(e){toast(e.message,'❌');}
+}
+function setRating(n){state.chatRating=n;const stars=document.querySelectorAll('#ratingStars button');stars.forEach((btn,idx)=>{btn.style.opacity=idx<n?'1':'0.3';});}
+async function submitRating(){
+  const feedback=document.getElementById('feedbackText').value.trim();
+  try{const res=await apiFetch(`/api/support/${state.currentChat.id}/close`,{method:'POST',body:JSON.stringify({rating:state.chatRating,feedback})});state.currentChat=res;renderChatMessages();toast('سپاس! رضایت ثبت شد','✅');setTimeout(()=>{closeChatWidget();state.currentChat=null;},2000);}catch(e){toast(e.message,'❌');}
+}
+
+function openAdminLogin(){const phone=prompt('شماره مدیر:','09120000000');if(!phone)return;const password=prompt('رمز مدیر:','1234');if(!password)return;adminLogin(phone,password);}
+async function adminLogin(phone,password){try{const res=await apiFetch('/api/auth/admin-login',{method:'POST',body:JSON.stringify({phone:toEnDigits(phone),password})});authToken=res.token;currentUser=res.user;saveLocal();updateUserLabel();openAdmin();toast('ورود مدیر موفق','✅');}catch(e){toast(e.message,'❌');}}
+function openAdmin(){if(!currentUser||currentUser.role!=='admin'){toast('ابتدا مدیر وارد شوید','🔐');openAdminLogin();return;}document.getElementById('adminLayout').classList.add('open');document.querySelector('header').style.display='none';document.getElementById('app').style.display='none';document.querySelector('.footer').style.display='none';document.querySelector('.chat-widget').style.display='none';adminNav('dashboard');}
+function closeAdmin(){document.getElementById('adminLayout').classList.remove('open');document.querySelector('header').style.display='';document.getElementById('app').style.display='';document.querySelector('.footer').style.display='';document.querySelector('.chat-widget').style.display='';}
+function adminNav(page){document.querySelectorAll('.admin-nav button').forEach(b=>b.classList.toggle('active',b.dataset.admin===page));['dashboard','products','categories','banners','orders','payments','support','users','festivals','sms'].forEach(p=>{const el=document.getElementById('admin-'+p);if(el)el.classList.toggle('hide',p!==page);});renderAdmin();}
+async function renderAdmin(){
+  try{
+    const allOrders=await apiFetch('/api/orders').catch(()=>state.orders);
+    const chats=await apiFetch('/api/support').catch(()=>[]);
+    document.getElementById('adminProductCount').textContent=toFaDigits(state.products.length);
+    document.getElementById('adminOrderCount').textContent=toFaDigits(allOrders.length);
+    const chatCountEl=document.getElementById('adminChatCount');if(chatCountEl)chatCountEl.textContent=toFaDigits(chats.filter(c=>c.status!=='closed').length);
+    const totalSales=allOrders.reduce((s,o)=>s+o.total,0);
+    document.getElementById('admin-dashboard').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="font-size:24px;font-weight:800">داشبورد اثیار - athyar.com</h2><span style="background:var(--green-50);padding:6px 12px;border-radius:999px;font-size:12px" class="fa-num">امروز: ${toFaDigits(new Date().toLocaleDateString('fa-IR'))}</span></div><div class="stat-grid"><div class="stat-card"><div style="font-size:12px;color:var(--text-light)">فروش کل</div><h3 class="fa-num">${formatPriceFa(totalSales)}</h3></div><div class="stat-card"><div style="font-size:12px;color:var(--text-light)">محصولات</div><h3 class="fa-num">${toFaDigits(state.products.length)}</h3></div><div class="stat-card"><div style="font-size:12px;color:var(--text-light)">سفارشات</div><h3 class="fa-num">${toFaDigits(allOrders.length)}</h3></div><div class="stat-card"><div style="font-size:12px;color:var(--text-light)">دسته‌بندی‌ها</div><h3 class="fa-num">${toFaDigits(state.categories.length)}</h3></div></div>`;
+    document.getElementById('admin-products').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="font-size:22px;font-weight:800">محصولات اثیار</h2><button class="btn btn-primary" onclick="openProductForm()">+ محصول جدید</button></div><div class="table-wrap" style="overflow:auto"><table class="table"><thead><tr><th>تصویر</th><th>نام</th><th>دسته</th><th>قیمت</th><th>تخفیف</th><th>موجودی</th><th>عملیات</th></tr></thead><tbody>${state.products.map(p=>`<tr><td><img src="${(p.images&&p.images[0])||''}" style="width:44px;height:44px;border-radius:10px;object-fit:cover"></td><td style="font-weight:600">${p.name.slice(0,32)}</td><td><span class="cat-chip" style="font-size:11px;padding:4px 8px">${p.category}</span></td><td class="fa-num">${toFaDigits(p.price.toLocaleString('en-US'))}</td><td class="fa-num">${p.discount?toFaDigits(p.discount)+'%':'-'}</td><td class="fa-num" style="color:${p.stock<10?'#EF4444':'inherit'}">${toFaDigits(p.stock)}</td><td><div style="display:flex;gap:6px"><button onclick="openProductForm(${p.id})" style="background:var(--green-50);padding:6px 10px;border-radius:8px;font-size:12px">ویرایش</button><button onclick="deleteProduct(${p.id})" style="background:#FEF2F2;color:#EF4444;padding:6px 10px;border-radius:8px;font-size:12px">حذف</button></div></td></tr>`).join('')}</tbody></table></div><div id="productFormWrap" class="hide" style="margin-top:20px"></div>`;
+    document.getElementById('admin-categories').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="font-size:22px;font-weight:800">دسته‌بندی‌ها</h2><button class="btn btn-primary" onclick="openCategoryForm()">+ دسته جدید</button></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">${state.categories.map(c=>`<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;gap:14px"><div style="width:64px;height:64px;border-radius:14px;background:${c.color};display:grid;place-items:center;font-size:28px">${c.icon}</div><div style="flex:1"><div style="font-weight:800">${c.name} <span class="fa-num" style="font-size:11px;background:var(--green-50);padding:2px 8px;border-radius:999px">${toFaDigits(c.count||0)} محصول</span></div><div style="font-size:12px;color:var(--text-light);margin-top:4px">${c.description||''}</div><div style="display:flex;gap:6px;margin-top:10px"><button onclick="openCategoryForm('${c.id}')" style="background:var(--green-50);padding:4px 10px;border-radius:8px;font-size:11px">ویرایش</button><button onclick="deleteCategory('${c.id}')" style="background:#FEF2F2;color:#EF4444;padding:4px 10px;border-radius:8px;font-size:11px">حذف</button></div></div></div>`).join('')}</div><div id="categoryFormWrap" class="hide" style="margin-top:20px"></div>`;
+    document.getElementById('admin-banners').innerHTML=`<h2 style="font-size:22px;font-weight:800;margin-bottom:20px">بنرها 🖼️</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="table-wrap" style="padding:20px"><h4 style="margin-bottom:12px">افزودن بنر جدید</h4><div class="form-group"><label>عنوان</label><input class="input" id="bTitle" placeholder="مثلا: طعم اصیل طبیعت"></div><div class="form-group"><label>زیرعنوان</label><input class="input" id="bSubtitle" placeholder="عسل و میوه خشک"></div><div class="form-group"><label>توضیح</label><textarea class="input" id="bDesc" rows="2"></textarea></div><div class="form-group"><label>عکس بنر</label><div style="display:flex;gap:8px"><input class="input" id="bImage" placeholder="لینک یا آپلود" style="flex:1"><input type="file" id="bFile" accept="image/*" style="display:none" onchange="uploadBannerImage(this)"><button class="btn btn-outline" style="padding:10px 14px" onclick="document.getElementById('bFile').click()">📤 آپلود</button></div><div id="bUploadStatus" style="font-size:11px;color:var(--text-light);margin-top:4px"></div></div><div class="form-grid"><div class="form-group"><label>رنگ</label><select class="input" id="bColor"><option value="green">سبز</option><option value="orange">نارنجی</option></select></div><div class="form-group"><label>متن دکمه</label><input class="input" id="bCta" placeholder="مشاهده"></div></div><button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="addBanner()">افزودن بنر</button></div><div style="display:flex;flex-direction:column;gap:12px">${state.banners.map(b=>`<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px;display:flex;gap:12px;align-items:center">${b.image?`<img src="${b.image}" style="width:60px;height:60px;border-radius:10px;object-fit:cover">`:`<div style="width:60px;height:60px;background:var(--paper);border-radius:10px;display:grid;place-items:center">🖼️</div>`}<div style="flex:1"><div style="font-weight:700">${b.title}</div><div style="font-size:12px;color:var(--text-light)">${b.subtitle}</div></div><div style="display:flex;gap:6px"><button onclick="toggleBanner(${b.id})" style="background:${b.active?'var(--green-50)':'#F3F4F6'};padding:6px 12px;border-radius:999px;font-size:12px">${b.active?'فعال ✅':'غیرفعال'}</button><button onclick="deleteBanner(${b.id})" style="background:#FEF2F2;color:#EF4444;padding:6px 10px;border-radius:8px;font-size:12px">حذف</button></div></div>`).join('')}</div></div>`;
+    document.getElementById('admin-orders').innerHTML=`<h2 style="font-size:22px;font-weight:800;margin-bottom:20px">سفارشات اثیار 📦</h2><div class="table-wrap" style="overflow:auto"><table class="table"><thead><tr><th>کد رهگیری</th><th>مشتری</th><th>موبایل</th><th>آدرس</th><th>مبلغ</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>${allOrders.map(o=>`<tr><td class="fa-num" style="font-weight:700">${o.tracking_code||'-'}</td><td>${o.name}</td><td class="fa-num">${toFaDigits(o.phone)}</td><td style="max-width:200px;font-size:12px">${o.province||''}، ${o.city||''}، ${o.street||''}، پلاک ${toFaDigits(o.plaque||'')} - ${o.address.slice(0,40)}</td><td class="fa-num" style="font-weight:700">${toFaDigits(o.total.toLocaleString('en-US'))}</td><td><select onchange="updateOrderStatus(${o.id},this.value)" style="border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:12px"><option ${o.status.includes('پرداخت')?'selected':''}>در انتظار پرداخت 💳</option><option ${o.status.includes('پردازش')?'selected':''}>در حال پردازش 🌿</option><option ${o.status.includes('تایید')?'selected':''}>تایید شد ✅</option><option ${o.status.includes('بسته')?'selected':''}>بسته‌بندی 📦</option><option ${o.status.includes('ارسال')?'selected':''}>ارسال شد 🚚</option><option ${o.status.includes('تحویل')?'selected':''}>تحویل داده شد 🎉</option></select></td><td><button onclick="deleteOrder(${o.id})" style="background:#FEF2F2;color:#EF4444;padding:4px 10px;border-radius:8px;font-size:12px">حذف</button></td></tr>`).join('')||'<tr><td colspan=7 style="text-align:center">سفارشی نیست</td></tr>'}</tbody></table></div>`;
+    try{
+      const payments=await apiFetch('/api/payment').catch(()=>[]);
+      document.getElementById('admin-payments').innerHTML=`<h2 style="font-size:22px;font-weight:800;margin-bottom:20px">💳 پرداخت‌ها</h2><div class="table-wrap" style="overflow:auto"><table class="table"><thead><tr><th>کد رهگیری</th><th>Authority</th><th>Ref ID</th><th>مبلغ</th><th>وضعیت</th><th>تاریخ</th></tr></thead><tbody>${payments.map(p=>`<tr><td class="fa-num">${p.tracking_code||'-'}</td><td style="font-family:monospace;font-size:11px">${(p.authority||'').slice(0,20)}...</td><td class="fa-num">${p.ref_id||'-'}</td><td class="fa-num">${formatPriceFa(p.amount)}</td><td><span style="background:${p.status==='paid'?'var(--green-50)':'#FEF2F2'};padding:4px 10px;border-radius:999px;font-size:11px">${p.status==='paid'?'✅ موفق':'⏳ در انتظار'}</span></td><td class="fa-num" style="font-size:11px">${new Date(p.created_at).toLocaleDateString('fa-IR')}</td></tr>`).join('')||'<tr><td colspan=6 style="text-align:center">پرداختی نیست</td></tr>'}</tbody></table></div>`;
+    }catch(e){}
+    document.getElementById('admin-support').innerHTML=`<h2 style="font-size:22px;font-weight:800;margin-bottom:20px">💬 مشاوره</h2><div style="display:grid;grid-template-columns:320px 1fr;gap:16px;height:600px"><div class="table-wrap" style="overflow:auto"><div style="padding:12px;font-weight:800;border-bottom:1px solid var(--border)">چت‌ها (${toFaDigits(chats.length)})</div>${chats.map(c=>`<div onclick="openAdminChat(${c.id})" style="padding:12px;border-bottom:1px solid #F3F4F6;cursor:pointer;background:${state.currentChat&&state.currentChat.id===c.id?'var(--green-50)':''};display:flex;gap:10px;align-items:center"><div style="width:40px;height:40px;border-radius:50%;background:${c.status==='waiting'?'var(--orange-400)':c.status==='active'?'var(--green-600)':'#9CA3AF'};color:#fff;display:grid;place-items:center;font-weight:800">${c.name[0]}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${c.name} <span class="fa-num" style="font-size:11px">${toFaDigits(c.phone.slice(-4))}</span></div><div style="font-size:11px;color:var(--text-light)">${c.status==='waiting'?'⏳ در انتظار':'✅ فعال'}</div></div></div>`).join('')||'<div style="padding:20px;text-align:center">چتی نیست</div>'}</div><div class="table-wrap" style="display:flex;flex-direction:column"><div id="adminChatHeader" style="padding:16px;border-bottom:1px solid var(--border);font-weight:800">یک چت را انتخاب کنید</div><div id="adminChatMessages" style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#F9FAFB"></div><div id="adminChatInput" class="hide" style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px"><input id="adminChatInputText" class="input" style="flex:1" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminChatMessage()"><button class="btn btn-primary" style="padding:10px 18px" onclick="sendAdminChatMessage()">ارسال</button></div></div></div>`;
+    document.getElementById('admin-users').innerHTML=`<h2 style="font-size:22px;font-weight:800;margin-bottom:20px">کاربران</h2><div class="table-wrap"><table class="table"><thead><tr><th>موبایل</th><th>سفارش</th><th>خرید کل</th></tr></thead><tbody>${[...new Set(allOrders.map(o=>o.phone))].map(phone=>{const uOrders=allOrders.filter(o=>o.phone===phone);return`<tr><td class="fa-num">${toFaDigits(phone)}</td><td class="fa-num">${toFaDigits(uOrders.length)}</td><td class="fa-num">${formatPriceFa(uOrders.reduce((s,o)=>s+o.total,0))}</td></tr>`}).join('')||'<tr><td colspan=3 style="text-align:center">کاربری نیست</td></tr>'}</tbody></table></div>`;
+  }catch(e){console.error(e);}
+}
+function openProductForm(id=null){
+  const wrap=document.getElementById('productFormWrap');const p=id?state.products.find(x=>x.id===id):{name:'',category:'honey',price:0,stock:10,discount:0,is_festival:false,is_new:true,is_organic:true,images:['https://images.unsplash.com/photo-1558642084-5d07fae4d90c?w=600'],description:'',benefits:['طبیعی'],usage_text:''};const benefitsStr=Array.isArray(p.benefits)?p.benefits.join(','):'';
+  wrap.classList.remove('hide');
+  wrap.innerHTML=`<div style="background:#fff;border:1.5px solid var(--green-100);border-radius:20px;padding:20px"><h4 style="font-weight:800;margin-bottom:14px">${id?'ویرایش':'محصول جدید'} 🌿</h4><div class="form-grid"><div class="form-group"><label>نام</label><input class="input" id="pfName" value="${p.name}"></div><div class="form-group"><label>دسته</label><select class="input" id="pfCat">${state.categories.map(c=>`<option value="${c.id}" ${p.category===c.id?'selected':''}>${c.name}</option>`).join('')}</select></div></div><div class="form-grid"><div class="form-group"><label>قیمت</label><input class="input fa-num" type="number" id="pfPrice" value="${p.price}"></div><div class="form-group"><label>موجودی</label><input class="input fa-num" type="number" id="pfStock" value="${p.stock}"></div></div><div class="form-grid"><div class="form-group"><label>تخفیف ٪</label><input class="input fa-num" type="number" id="pfDiscount" value="${p.discount||0}"></div><div class="form-group"><label>تصویر</label><div style="display:flex;gap:8px"><input class="input" id="pfImage" value="${(p.images&&p.images[0])||''}" style="flex:1"><input type="file" id="pfFile" accept="image/*" style="display:none" onchange="uploadImage(this)"><button class="btn btn-outline" style="padding:10px 14px" onclick="document.getElementById('pfFile').click()">📤</button></div><div id="uploadStatus" style="font-size:11px;margin-top:4px"></div></div></div><div class="form-group"><label>توضیحات</label><textarea class="input" id="pfDesc" rows="2">${p.description||''}</textarea></div><div class="form-grid"><div class="form-group"><label>خواص (کاما)</label><input class="input" id="pfBenefits" value="${benefitsStr}"></div><div class="form-group"><label>نحوه مصرف</label><input class="input" id="pfUsage" value="${p.usage_text||''}"></div></div><div style="display:flex;gap:10px;margin-top:10px"><label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="pfFestival" ${p.is_festival?'checked':''}> ویژه 🎉</label><label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="pfNew" ${p.is_new?'checked':''}> جدید ✨</label><label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="pfOrganic" ${p.is_organic?'checked':''}> ارگانیک 🌱</label></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-primary" onclick="saveProduct(${id||'null'})">ذخیره ✅</button><button class="btn btn-outline" onclick="document.getElementById('productFormWrap').classList.add('hide')">انصراف</button></div></div>`;
+  wrap.scrollIntoView({behavior:'smooth'});
+}
+async function uploadImage(input){const file=input.files[0];if(!file)return;const status=document.getElementById('uploadStatus');status.textContent='⏳ آپلود...';const formData=new FormData();formData.append('image',file);try{const res=await fetch('/api/upload',{method:'POST',headers:{'Authorization':'Bearer '+authToken},body:formData});const data=await res.json();if(!res.ok)throw new Error(data.error);document.getElementById('pfImage').value=data.url;status.textContent='✅ '+data.url;}catch(e){status.textContent='❌ '+e.message;}}
+async function saveProduct(id){const data={name:document.getElementById('pfName').value.trim(),category:document.getElementById('pfCat').value,price:parseInt(toEnDigits(document.getElementById('pfPrice').value))||0,stock:parseInt(toEnDigits(document.getElementById('pfStock').value))||0,discount:parseInt(toEnDigits(document.getElementById('pfDiscount').value))||0,images:[document.getElementById('pfImage').value.trim()],description:document.getElementById('pfDesc').value.trim(),benefits:document.getElementById('pfBenefits').value.split(',').map(s=>s.trim()).filter(Boolean),usage_text:document.getElementById('pfUsage').value.trim(),is_festival:document.getElementById('pfFestival').checked,is_new:document.getElementById('pfNew').checked,is_organic:document.getElementById('pfOrganic').checked};if(!data.name){toast('نام الزامی','⚠️');return;}try{if(id)await apiFetch('/api/products/'+id,{method:'PUT',body:JSON.stringify(data)});else await apiFetch('/api/products',{method:'POST',body:JSON.stringify(data)});document.getElementById('productFormWrap').classList.add('hide');await loadAll();toast('ذخیره شد','✅');}catch(e){toast(e.message,'❌');}}
+async function deleteProduct(id){if(!confirm('حذف؟'))return;try{await apiFetch('/api/products/'+id,{method:'DELETE'});await loadAll();}catch(e){toast(e.message,'❌');}}
+function openCategoryForm(id=null){
+  const wrap=document.getElementById('categoryFormWrap');const c=id?state.categories.find(x=>x.id===id):{id:'',name:'',icon:'🌿',color:'#E0F2E9',description:'',image:''};
+  wrap.classList.remove('hide');
+  wrap.innerHTML=`<div style="background:#fff;border:1.5px solid var(--green-100);border-radius:20px;padding:20px"><h4 style="font-weight:800;margin-bottom:14px">${id?'ویرایش دسته':'دسته جدید'} 📂</h4><div class="form-grid"><div class="form-group"><label>شناسه انگلیسی</label><input class="input" id="cfId" value="${c.id}" ${id?'disabled':''} placeholder="honey"></div><div class="form-group"><label>نام فارسی</label><input class="input" id="cfName" value="${c.name}"></div></div><div class="form-grid"><div class="form-group"><label>آیکون</label><input class="input" id="cfIcon" value="${c.icon}"></div><div class="form-group"><label>رنگ</label><input type="color" class="input" id="cfColor" value="${c.color}" style="height:48px"></div></div><div class="form-group"><label>توضیحات</label><textarea class="input" id="cfDesc" rows="2">${c.description||''}</textarea></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-primary" onclick="saveCategory('${id||''}')">ذخیره ✅</button><button class="btn btn-outline" onclick="document.getElementById('categoryFormWrap').classList.add('hide')">انصراف</button></div></div>`;
+}
+async function saveCategory(id){const newId=document.getElementById('cfId').value.trim();const data={id:newId,name:document.getElementById('cfName').value.trim(),icon:document.getElementById('cfIcon').value.trim()||'🌿',color:document.getElementById('cfColor').value,description:document.getElementById('cfDesc').value.trim(),image:''};if(!data.id||!data.name){toast('شناسه و نام الزامی','⚠️');return;}try{if(id)await apiFetch('/api/categories/'+id,{method:'PUT',body:JSON.stringify(data)});else await apiFetch('/api/categories',{method:'POST',body:JSON.stringify(data)});document.getElementById('categoryFormWrap').classList.add('hide');await loadAll();toast('ذخیره شد','✅');}catch(e){toast(e.message,'❌');}}
+async function deleteCategory(id){if(!confirm('حذف دسته؟'))return;try{await apiFetch('/api/categories/'+id,{method:'DELETE'});await loadAll();}catch(e){toast(e.message,'❌');}}
+async function uploadBannerImage(input){const file=input.files[0];if(!file)return;const status=document.getElementById('bUploadStatus');status.textContent='⏳ آپلود...';const formData=new FormData();formData.append('image',file);try{const res=await fetch('/api/upload',{method:'POST',headers:{'Authorization':'Bearer '+authToken},body:formData});const data=await res.json();if(!res.ok)throw new Error(data.error);document.getElementById('bImage').value=data.url;status.textContent='✅ '+data.url;}catch(e){status.textContent='❌ '+e.message;}}
+async function addBanner(){const b={title:document.getElementById('bTitle').value.trim(),subtitle:document.getElementById('bSubtitle').value.trim(),description:document.getElementById('bDesc').value.trim(),color:document.getElementById('bColor').value,cta:document.getElementById('bCta').value.trim()||'مشاهده',image:document.getElementById('bImage').value.trim(),active:true};if(!b.title){toast('عنوان الزامی','⚠️');return;}try{await apiFetch('/api/banners',{method:'POST',body:JSON.stringify(b)});await loadAll();toast('بنر اضافه شد','🖼️');}catch(e){toast(e.message,'❌');}}
+async function deleteBanner(id){try{await apiFetch('/api/banners/'+id,{method:'DELETE'});await loadAll();}catch(e){toast(e.message,'❌');}}
+async function toggleBanner(id){const b=state.banners.find(x=>x.id===id);if(!b)return;try{await apiFetch('/api/banners/'+id,{method:'PUT',body:JSON.stringify({...b,active:!b.active})});await loadAll();}catch(e){toast(e.message,'❌');}}
+async function updateOrderStatus(id,status){try{await apiFetch('/api/orders/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});toast('آپدیت شد','✅');}catch(e){toast(e.message,'❌');}}
+async function deleteOrder(id){if(!confirm('حذف سفارش؟'))return;try{await apiFetch('/api/orders/'+id,{method:'DELETE'});renderAdmin();}catch(e){toast(e.message,'❌');}}
+async function openAdminChat(chatId){try{const chat=await apiFetch('/api/support/'+chatId);state.currentChat=chat;document.getElementById('adminChatHeader').innerHTML=`<div style="display:flex;justify-content:space-between"><div><div style="font-weight:800">${chat.name} - ${chat.subject}</div><div style="font-size:12px" class="fa-num">${toFaDigits(chat.phone)} - ${chat.status}</div></div></div>`;const msgsEl=document.getElementById('adminChatMessages');msgsEl.innerHTML=chat.messages.map(m=>`<div style="max-width:80%;padding:10px 14px;border-radius:18px;font-size:13px;${m.sender==='user'?'align-self:flex-start;background:#fff;border:1px solid var(--border)':'align-self:flex-end;background:var(--green-700);color:#fff'}">${m.message}</div>`).join('');msgsEl.scrollTop=msgsEl.scrollHeight;document.getElementById('adminChatInput').classList.remove('hide');}catch(e){toast(e.message,'❌');}}
+async function sendAdminChatMessage(){const input=document.getElementById('adminChatInputText');const msg=input.value.trim();if(!msg||!state.currentChat)return;input.value='';try{const res=await apiFetch(`/api/support/${state.currentChat.id}/message`,{method:'POST',body:JSON.stringify({message:msg})});state.currentChat.messages=res.messages;openAdminChat(state.currentChat.id);}catch(e){toast(e.message,'❌');}}
+
+function openModal(id){document.getElementById(id).classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function openDrawer(id){document.getElementById(id).classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeAll(){document.querySelectorAll('.modal,.drawer,.overlay').forEach(el=>el.classList.remove('open'));document.body.style.overflow='';}
+setInterval(()=>{const el=document.getElementById('timerText');if(!el)return;const now=new Date();const end=new Date();end.setHours(23,59,59);const diff=end-now;const h=Math.floor(diff/3600000).toString().padStart(2,'0');const m=Math.floor(diff%3600000/60000).toString().padStart(2,'0');const s=Math.floor(diff%60000/1000).toString().padStart(2,'0');el.textContent=`${toFaDigits(h)} : ${toFaDigits(m)} : ${toFaDigits(s)} : ۰۳`;},1000);
+(async()=>{
+  // هندل پرداخت
+  const hash=window.location.hash;
+  if(hash.includes('payment-success')){
+    const params=new URLSearchParams(hash.split('?')[1]||'');const tracking=params.get('tracking');const ref=params.get('ref');
+    setTimeout(()=>{
+      const html=`<div style="text-align:center;padding:24px"><div style="width:88px;height:88px;background:#DCFCE7;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:48px">✅</div><h2 style="font-weight:800;color:var(--green-800)">پرداخت موفق!</h2>${tracking?`<div style="background:var(--green-50);border-radius:12px;padding:12px;margin:16px 0"><div style="font-size:12px">کد رهگیری</div><div style="font-weight:800" class="fa-num">${tracking}</div></div>`:''}<div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-primary" style="flex:1" onclick="closeAll();trackOrderByCode('${tracking}')">پیگیری 📦</button><button class="btn btn-outline" style="flex:1" onclick="closeAll();router('home')">خانه</button></div></div>`;
+      document.getElementById('userModalBody').innerHTML=html;document.getElementById('userModalTitle').textContent='✅ پرداخت موفق';openModal('userModal');state.cart=[];saveLocal();updateCartCount();window.history.replaceState(null,'',window.location.pathname);
+    },500);
+  }
+  await loadAll();
+})();
+</script>
+</body>
+</html>

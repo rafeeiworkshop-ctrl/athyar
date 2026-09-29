@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  attari:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    restart: unless-stopped
